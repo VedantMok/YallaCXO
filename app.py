@@ -302,7 +302,11 @@ with st.expander('Pitch setup: company selection, filters, and appearance', expa
     st.markdown("<div class='setup-shell'><div class='setup-head'><div><div class='setup-title'>Pitch setup</div><div class='setup-copy'>Adjust appearance, narrow the account universe, and choose the company you want to pitch. Keep this panel collapsed during presentations for a cleaner view.</div></div></div></div>", unsafe_allow_html=True)
     top_a, top_b, top_c = st.columns([1.25, 0.55, 0.55], gap='large')
     with top_a:
-        st.selectbox('Company to pitch', sorted(df['company_name'].tolist()), key='selected_company')
+        company_options = sorted(df['company_name'].tolist())
+        setup_index = company_options.index(st.session_state.selected_company) if st.session_state.selected_company in company_options else 0
+        setup_company = st.selectbox('Company to pitch', company_options, index=setup_index, key='setup_selected_company')
+        if setup_company != st.session_state.selected_company:
+            st.session_state.selected_company = setup_company
     with top_b:
         light_toggle = st.toggle('Light mode', value=st.session_state.appearance_mode == 'Light')
         st.session_state.appearance_mode = 'Light' if light_toggle else 'Dark'
