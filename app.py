@@ -15,39 +15,30 @@ def enable_altair_theme():
             "config": {
                 "background": "transparent",
                 "view": {"stroke": None},
-                "title": {
-                    "color": "#E8FFF3",
-                    "fontSize": 18,
-                    "font": "Space Grotesk",
-                    "anchor": "start",
-                    "fontWeight": 700,
-                },
+                "title": {"color": "#EAFEF3", "fontSize": 18, "font": "Space Grotesk", "anchor": "start", "fontWeight": 700},
                 "axis": {
-                    "labelColor": "#B8D8C6",
-                    "titleColor": "#DDFBEA",
-                    "gridColor": "rgba(120, 170, 145, 0.18)",
-                    "domainColor": "rgba(120, 170, 145, 0.28)",
-                    "tickColor": "rgba(120, 170, 145, 0.28)",
+                    "labelColor": "#B9D8C8",
+                    "titleColor": "#EAFEF3",
+                    "gridColor": "rgba(120,170,145,0.16)",
+                    "domainColor": "rgba(120,170,145,0.24)",
+                    "tickColor": "rgba(120,170,145,0.24)",
                     "labelFont": "Inter",
                     "titleFont": "Inter",
                 },
                 "legend": {
-                    "labelColor": "#CFEBDC",
-                    "titleColor": "#E8FFF3",
+                    "labelColor": "#CDE8DA",
+                    "titleColor": "#EAFEF3",
                     "labelFont": "Inter",
                     "titleFont": "Inter",
                 },
-                "range": {
-                    "category": ["#00F5A0", "#00D9F5", "#7C5CFF", "#FF7BEA", "#FFC857", "#29E7CD"]
-                },
+                "range": {"category": ["#00F5A0", "#00D9F5", "#7C5CFF", "#FF7BEA", "#FFC857", "#29E7CD"]},
             }
         }
-
     try:
-        alt.themes.register("yalla_futuristic", theme)
+        alt.themes.register("yalla_futuristic_fixed", theme)
     except Exception:
         pass
-    alt.themes.enable("yalla_futuristic")
+    alt.themes.enable("yalla_futuristic_fixed")
 
 
 def inject_css():
@@ -55,7 +46,7 @@ def inject_css():
         """
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
-        html, body, [class*="css"]  {font-family: 'Inter', sans-serif;}
+        html, body, [class*="css"] {font-family: 'Inter', sans-serif;}
         .stApp {
             background:
                 radial-gradient(circle at 10% 20%, rgba(0, 245, 160, 0.08), transparent 28%),
@@ -63,7 +54,7 @@ def inject_css():
                 linear-gradient(180deg, #07120D 0%, #091B14 34%, #0C1612 100%);
             color: #ECFFF4;
         }
-        .block-container {padding-top: 1.1rem; padding-bottom: 2rem;}
+        .block-container {padding-top: 1.15rem; padding-bottom: 2.2rem; max-width: 1420px;}
         section[data-testid="stSidebar"] {
             background: linear-gradient(180deg, rgba(8,19,14,0.98), rgba(9,27,20,0.96));
             border-right: 1px solid rgba(123, 163, 140, 0.18);
@@ -72,11 +63,11 @@ def inject_css():
             background: linear-gradient(135deg, rgba(11,35,23,0.92) 0%, rgba(10,59,39,0.92) 42%, rgba(0,177,79,0.88) 100%);
             border: 1px solid rgba(110, 220, 165, 0.24);
             border-radius: 28px;
-            padding: 1.3rem 1.45rem 1.15rem 1.45rem;
+            padding: 1.6rem 1.75rem 1.35rem 1.75rem;
             box-shadow: 0 20px 54px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255,255,255,0.05);
-            margin-bottom: 1rem;
-            overflow: hidden;
+            margin-bottom: 1.15rem;
             position: relative;
+            overflow: hidden;
         }
         .hero-shell:before {
             content: '';
@@ -87,63 +78,91 @@ def inject_css():
             animation: shimmer 7s infinite linear;
         }
         @keyframes shimmer {100% {transform: translateX(100%);}}
-        .hero-title {font-family: 'Space Grotesk', sans-serif; font-size: 2.25rem; font-weight: 700; margin: 0; color: #F4FFF9;}
-        .hero-sub {margin-top: .38rem; color: #D7FCE7; max-width: 900px; line-height: 1.55;}
+        .hero-title {font-family: 'Space Grotesk', sans-serif; font-size: 2.3rem; font-weight: 700; margin: 0; color: #F4FFF9;}
+        .hero-sub {margin-top: .45rem; color: #D7FCE7; max-width: 980px; line-height: 1.6; font-size: 1rem;}
         .glass-card {
-            background: linear-gradient(180deg, rgba(13,27,20,0.80), rgba(9,19,15,0.72));
+            background: linear-gradient(180deg, rgba(13,27,20,0.82), rgba(9,19,15,0.74));
             border: 1px solid rgba(124, 169, 144, 0.18);
-            border-radius: 22px;
-            padding: 1rem 1.05rem;
+            border-radius: 24px;
+            padding: 1.35rem 1.35rem 1.2rem 1.35rem;
             box-shadow: 0 16px 36px rgba(0,0,0,0.18);
             backdrop-filter: blur(12px);
-            transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+            margin-bottom: 1.05rem;
         }
-        .glass-card:hover {transform: translateY(-2px); border-color: rgba(0,245,160,0.35); box-shadow: 0 18px 40px rgba(0,0,0,0.22);}
+        .badge-row {display:flex; gap:.6rem; flex-wrap:wrap; margin:.95rem 0 1.05rem 0;}
+        .badge-pill {
+            display:inline-flex; align-items:center; gap:.4rem; padding:.48rem .78rem;
+            background: rgba(255,255,255,0.07); color:#E9FFF4; border:1px solid rgba(190,255,223,0.12);
+            border-radius:999px; font-size:.83rem; line-height:1;
+        }
+        .section-kicker {font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: #8FD5B0; margin-bottom: .32rem;}
+        .section-title {font-family: 'Space Grotesk', sans-serif; color: #ECFFF4; font-size: 1.38rem; margin: .1rem 0 .18rem 0;}
+        .section-copy {color:#AFCFBE; line-height:1.58; margin-bottom:.95rem;}
         .kpi-card {
-            background: linear-gradient(180deg, rgba(11,25,19,0.84), rgba(8,17,13,0.80));
+            background: linear-gradient(180deg, rgba(11,25,19,0.84), rgba(8,17,13,0.78));
             border: 1px solid rgba(125, 167, 144, 0.17);
-            border-radius: 20px;
-            padding: .95rem 1rem;
-            min-height: 108px;
+            border-radius: 22px;
+            padding: 1rem 1rem .95rem 1rem;
+            min-height: 126px;
             box-shadow: 0 14px 30px rgba(0,0,0,0.18);
         }
-        .kpi-label {font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; color: #95C4AB; margin-bottom: .3rem;}
-        .kpi-value {font-family: 'Space Grotesk', sans-serif; font-size: 1.55rem; font-weight: 700; color: #F0FFF6; margin-bottom: .2rem;}
-        .kpi-sub {font-size: .84rem; color: #B8D8C6; line-height: 1.35;}
-        .badge-row {display:flex; gap:.55rem; flex-wrap:wrap; margin-top:.8rem;}
-        .badge-pill {
-            display:inline-flex; align-items:center; gap:.4rem; padding:.45rem .72rem;
-            background: rgba(255,255,255,0.08); color:#E9FFF4; border:1px solid rgba(190,255,223,0.12);
-            border-radius:999px; font-size:.82rem;
+        .kpi-label {font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; color: #95C4AB; margin-bottom: .34rem;}
+        .kpi-value {font-family: 'Space Grotesk', sans-serif; font-size: 1.52rem; font-weight: 700; color: #F0FFF6; margin-bottom: .26rem; line-height:1.1;}
+        .kpi-sub {font-size: .84rem; color: #B8D8C6; line-height: 1.45;}
+        .mini-stat-grid {display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:.85rem; margin-top:.25rem;}
+        .mini-stat {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: .95rem 1rem;
+            min-height: 108px;
         }
-        .section-kicker {font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: #8FD5B0; margin-bottom: .28rem;}
-        .section-title {font-family: 'Space Grotesk', sans-serif; color: #ECFFF4; font-size: 1.35rem; margin: .1rem 0 .15rem 0;}
-        .section-copy {color:#AFCFBE; line-height:1.52; margin-bottom:.9rem;}
+        .mini-stat .label {color:#8FC9AD; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em;}
+        .mini-stat .value {font-family:'Space Grotesk',sans-serif; color:#F2FFF8; font-size:1.15rem; margin-top:.22rem;}
+        .mini-stat .sub {color:#B6D4C4; font-size:.82rem; margin-top:.22rem; line-height:1.45;}
+        .callout-box {
+            background: linear-gradient(180deg, rgba(10,33,22,0.92), rgba(11,54,34,0.82));
+            border:1px solid rgba(0,245,160,0.18);
+            border-radius:22px;
+            padding:1rem 1.1rem;
+            margin:.8rem 0 1.15rem 0;
+            box-shadow:0 16px 32px rgba(0,0,0,0.18);
+            line-height:1.6;
+        }
+        .callout-box strong {color:#F2FFF8;}
         .insight-box {
             background: linear-gradient(180deg, rgba(10,22,16,0.84), rgba(8,17,13,0.76));
             border:1px solid rgba(124,167,144,0.18);
             border-left:4px solid #00F5A0;
             border-radius:18px;
-            padding:.95rem 1rem;
+            padding:1rem 1.02rem;
             box-shadow:0 12px 28px rgba(0,0,0,0.16);
             height:100%;
         }
-        .insight-box h4 {margin:0 0 .4rem 0; color:#F1FFF8; font-size:1rem;}
-        .insight-box p {margin:0; color:#B9D8C8; line-height:1.52;}
-        .callout-box {
-            background: linear-gradient(180deg, rgba(10,33,22,0.92), rgba(11,54,34,0.82));
-            border:1px solid rgba(0,245,160,0.18);
-            border-radius:22px; padding:1rem 1.05rem; margin:.65rem 0 1rem 0;
-            box-shadow:0 16px 32px rgba(0,0,0,0.18);
+        .insight-box h4 {margin:0 0 .45rem 0; color:#F1FFF8; font-size:1rem;}
+        .insight-box p {margin:0; color:#B9D8C8; line-height:1.56;}
+        .stTabs [data-baseweb="tab-list"] {gap: .55rem; margin-bottom: .4rem;}
+        .stTabs [data-baseweb="tab"] {
+            background: rgba(255,255,255,0.04);
+            border:1px solid rgba(130,170,150,0.12);
+            border-radius:14px;
+            color:#B8D8C6;
+            padding:.6rem 1rem;
         }
-        .callout-box strong {color:#F2FFF8;}
-        .mini-stat-grid {display:grid; grid-template-columns:repeat(3, 1fr); gap:.8rem; margin-top:.9rem;}
-        .mini-stat {background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:18px; padding:.85rem .95rem;}
-        .mini-stat .label {color:#8FC9AD; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em;}
-        .mini-stat .value {font-family:'Space Grotesk',sans-serif; color:#F2FFF8; font-size:1.15rem; margin-top:.22rem;}
-        .mini-stat .sub {color:#B6D4C4; font-size:.82rem; margin-top:.18rem; line-height:1.4;}
-        .dataframe, div[data-testid="stDataFrame"] {border-radius:18px; overflow:hidden;}
-        div[data-baseweb="select"] > div, div[data-baseweb="input"] > div {background: rgba(255,255,255,0.04); border-color: rgba(130,170,150,0.18);}
+        .stTabs [aria-selected="true"] {
+            background: linear-gradient(180deg, rgba(0,245,160,0.14), rgba(0,217,245,0.14));
+            color:#F1FFF8;
+            border-color: rgba(0,245,160,0.32);
+        }
+        div[data-baseweb="select"] > div, div[data-baseweb="input"] > div {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(130,170,150,0.18);
+        }
+        div[data-testid="stDataFrame"] {
+            border:1px solid rgba(124,167,144,0.16);
+            border-radius:18px;
+            overflow:hidden;
+        }
         div[data-testid="stMetric"] {
             background: linear-gradient(180deg, rgba(11,25,19,0.84), rgba(8,17,13,0.78));
             border: 1px solid rgba(125,167,144,0.17);
@@ -151,11 +170,10 @@ def inject_css():
             padding: .62rem .75rem;
             box-shadow: 0 12px 28px rgba(0,0,0,0.16);
         }
-        .stTabs [data-baseweb="tab-list"] {gap: .5rem;}
-        .stTabs [data-baseweb="tab"] {
-            background: rgba(255,255,255,0.04); border:1px solid rgba(130,170,150,0.12); border-radius:14px; color:#B8D8C6; padding:.55rem .95rem;
+        @media (max-width: 1100px) {
+            .mini-stat-grid {grid-template-columns:1fr;}
+            .hero-title {font-size: 1.9rem;}
         }
-        .stTabs [aria-selected="true"] {background: linear-gradient(180deg, rgba(0,245,160,0.14), rgba(0,217,245,0.14)); color:#F1FFF8; border-color: rgba(0,245,160,0.32);}
         </style>
         """,
         unsafe_allow_html=True,
@@ -174,10 +192,7 @@ def fmt_aed(x):
 
 
 def section_header(kicker, title, copy):
-    st.markdown(
-        f"<div class='section-kicker'>{kicker}</div><div class='section-title'>{title}</div><div class='section-copy'>{copy}</div>",
-        unsafe_allow_html=True,
-    )
+    st.markdown(f"<div class='section-kicker'>{kicker}</div><div class='section-title'>{title}</div><div class='section-copy'>{copy}</div>", unsafe_allow_html=True)
 
 
 def insight_card(title, text):
@@ -185,10 +200,7 @@ def insight_card(title, text):
 
 
 def kpi_card(title, value, subtitle):
-    st.markdown(
-        f"<div class='kpi-card'><div class='kpi-label'>{title}</div><div class='kpi-value'>{value}</div><div class='kpi-sub'>{subtitle}</div></div>",
-        unsafe_allow_html=True,
-    )
+    st.markdown(f"<div class='kpi-card'><div class='kpi-label'>{title}</div><div class='kpi-value'>{value}</div><div class='kpi-sub'>{subtitle}</div></div>", unsafe_allow_html=True)
 
 
 def callout(text):
@@ -196,11 +208,7 @@ def callout(text):
 
 
 def role_profile_chart(row):
-    df = pd.DataFrame({
-        'Role': ['CFO', 'CTO', 'CHRO', 'CMO', 'COO'],
-        'Need Score': [row['cfo_need_score'], row['cto_need_score'], row['chro_need_score'], row['cmo_need_score'], row['coo_need_score']]
-    }).sort_values('Need Score', ascending=True)
-
+    df = pd.DataFrame({'Role': ['CFO', 'CTO', 'CHRO', 'CMO', 'COO'], 'Need Score': [row['cfo_need_score'], row['cto_need_score'], row['chro_need_score'], row['cmo_need_score'], row['coo_need_score']]}).sort_values('Need Score', ascending=True)
     bars = alt.Chart(df).mark_bar(cornerRadiusEnd=10, height=26).encode(
         x=alt.X('Need Score:Q', title='Need Score', scale=alt.Scale(domain=[0, 100])),
         y=alt.Y('Role:N', sort=None, title=''),
@@ -214,20 +222,14 @@ def role_profile_chart(row):
 
 
 def company_cost_chart(row):
-    df = pd.DataFrame({
-        'Model': ['Full-time executive stack', 'Yalla CXO hybrid model', 'Annual savings unlocked'],
-        'Value': [row['full_time_equivalent_cost_aed'], row['fractional_ai_solution_cost_aed'], row['estimated_annual_savings_aed']],
-        'Group': ['Cost', 'Cost', 'Savings']
-    })
+    df = pd.DataFrame({'Model': ['Full-time executive stack', 'Yalla CXO hybrid model', 'Annual savings unlocked'], 'Value': [row['full_time_equivalent_cost_aed'], row['fractional_ai_solution_cost_aed'], row['estimated_annual_savings_aed']], 'Group': ['Cost', 'Cost', 'Savings']})
     bars = alt.Chart(df).mark_bar(cornerRadiusTopLeft=10, cornerRadiusTopRight=10, size=52).encode(
         x=alt.X('Model:N', title=''),
         y=alt.Y('Value:Q', title='Annual AED Value'),
         color=alt.Color('Group:N', scale=alt.Scale(domain=['Cost', 'Savings'], range=['#4D5D59', '#00F5A0']), title=''),
         tooltip=['Model', alt.Tooltip('Value:Q', format=',.0f')]
     )
-    text = alt.Chart(df).mark_text(dy=-10, color='#E8FFF3', font='Inter', fontSize=11).encode(
-        x='Model:N', y='Value:Q', text=alt.Text('Value:Q', format=',.0f')
-    )
+    text = alt.Chart(df).mark_text(dy=-10, color='#E8FFF3', font='Inter', fontSize=11).encode(x='Model:N', y='Value:Q', text=alt.Text('Value:Q', format=',.0f'))
     return (bars + text).properties(title='Economic case versus full-time hiring', height=320)
 
 
@@ -237,13 +239,12 @@ def operating_signal_chart(row):
         'Value': [row['cash_flow_volatility_score'], row['digital_maturity_score'], row['process_efficiency_score'], row['attrition_rate_pct'] * 3, row['campaign_roi_x'] * 20, row['win_probability'] * 100],
         'Category': ['Finance', 'Technology', 'Operations', 'People', 'Growth', 'Commercial']
     }).sort_values('Value', ascending=True)
-    bars = alt.Chart(signals).mark_bar(cornerRadiusEnd=10, height=22).encode(
+    return alt.Chart(signals).mark_bar(cornerRadiusEnd=10, height=22).encode(
         x=alt.X('Value:Q', title='Scaled score / intensity'),
         y=alt.Y('Signal:N', sort=None, title=''),
         color=alt.Color('Category:N', title=''),
         tooltip=['Signal', 'Category', alt.Tooltip('Value:Q', format='.1f')]
-    )
-    return bars.properties(title='Operating signal snapshot', height=300)
+    ).properties(title='Operating signal snapshot', height=300)
 
 
 def peer_position_chart(filtered, row):
@@ -251,10 +252,8 @@ def peer_position_chart(filtered, row):
     peers['selected'] = peers['company_name'].eq(row['company_name'])
     x_mid = peers['estimated_annual_savings_aed'].median()
     y_mid = peers['expected_annual_contract_value_aed'].median()
-
     rules_x = alt.Chart(pd.DataFrame({'x': [x_mid]})).mark_rule(strokeDash=[6, 6], color='rgba(210,255,230,0.25)').encode(x='x:Q')
     rules_y = alt.Chart(pd.DataFrame({'y': [y_mid]})).mark_rule(strokeDash=[6, 6], color='rgba(210,255,230,0.25)').encode(y='y:Q')
-
     base = alt.Chart(peers).mark_circle(opacity=0.76, stroke='white', strokeWidth=0.6).encode(
         x=alt.X('estimated_annual_savings_aed:Q', title='Estimated Annual Savings (AED)'),
         y=alt.Y('expected_annual_contract_value_aed:Q', title='Expected ACV (AED)'),
@@ -262,9 +261,7 @@ def peer_position_chart(filtered, row):
         color=alt.condition(alt.datum.selected, alt.value('#FF5D8F'), alt.Color('primary_fractional_cxo:N', title='Primary CXO')),
         tooltip=['company_name', 'sector', 'primary_fractional_cxo', 'secondary_fractional_cxo', 'estimated_annual_savings_aed', 'expected_annual_contract_value_aed', 'win_probability']
     )
-    label = alt.Chart(peers[peers['selected']]).mark_text(dx=8, dy=-8, color='#F4FFF9', font='Inter', fontSize=11).encode(
-        x='estimated_annual_savings_aed:Q', y='expected_annual_contract_value_aed:Q', text='company_name:N'
-    )
+    label = alt.Chart(peers[peers['selected']]).mark_text(dx=8, dy=-8, color='#F4FFF9', font='Inter', fontSize=11).encode(x='estimated_annual_savings_aed:Q', y='expected_annual_contract_value_aed:Q', text='company_name:N')
     return (rules_x + rules_y + base + label).properties(title='Portfolio position of the selected company', height=360)
 
 
@@ -272,41 +269,25 @@ def savings_trajectory_chart(row):
     months = list(range(1, 13))
     full_monthly = row['full_time_equivalent_cost_aed'] / 12
     yalla_monthly = row['fractional_ai_solution_cost_aed'] / 12
-    data = pd.DataFrame({
-        'Month': months,
-        'Full-time cumulative cost': [full_monthly * m for m in months],
-        'Yalla CXO cumulative cost': [yalla_monthly * m for m in months],
-    })
+    data = pd.DataFrame({'Month': months, 'Full-time cumulative cost': [full_monthly * m for m in months], 'Yalla CXO cumulative cost': [yalla_monthly * m for m in months]})
     long = data.melt('Month', var_name='Path', value_name='Value')
-    line = alt.Chart(long).mark_line(point=True, strokeWidth=3).encode(
+    return alt.Chart(long).mark_line(point=True, strokeWidth=3).encode(
         x=alt.X('Month:O', title='Month'),
         y=alt.Y('Value:Q', title='Cumulative AED Cost'),
         color=alt.Color('Path:N', scale=alt.Scale(domain=['Full-time cumulative cost', 'Yalla CXO cumulative cost'], range=['#FF7B72', '#00F5A0']), title=''),
         tooltip=['Month', 'Path', alt.Tooltip('Value:Q', format=',.0f')]
-    )
-    return line.properties(title='12-month cost path comparison', height=320)
+    ).properties(title='12-month cost path comparison', height=320)
 
 
 def comparable_accounts(filtered, row):
     subset = filtered.copy()
-    subset['distance'] = (
-        (subset['revenue_aed_bn'] - row['revenue_aed_bn']).abs() * 2
-        + (subset['urgency_score'] - row['urgency_score']).abs() * 0.45
-        + (subset['expected_annual_contract_value_aed'] - row['expected_annual_contract_value_aed']).abs() / 500000
-    )
+    subset['distance'] = ((subset['revenue_aed_bn'] - row['revenue_aed_bn']).abs() * 2 + (subset['urgency_score'] - row['urgency_score']).abs() * 0.45 + (subset['expected_annual_contract_value_aed'] - row['expected_annual_contract_value_aed']).abs() / 500000)
     subset = subset[subset['company_name'] != row['company_name']].sort_values('distance').head(5)
     out = subset[['company_name', 'sector', 'primary_fractional_cxo', 'estimated_annual_savings_aed', 'expected_annual_contract_value_aed', 'win_probability']].copy()
     out['estimated_annual_savings_aed'] = out['estimated_annual_savings_aed'].map(fmt_aed)
     out['expected_annual_contract_value_aed'] = out['expected_annual_contract_value_aed'].map(fmt_aed)
     out['win_probability'] = (out['win_probability'] * 100).round(1).astype(str) + '%'
-    return out.rename(columns={
-        'company_name': 'Comparable company',
-        'sector': 'Sector',
-        'primary_fractional_cxo': 'Primary CXO',
-        'estimated_annual_savings_aed': 'Savings',
-        'expected_annual_contract_value_aed': 'Expected ACV',
-        'win_probability': 'Win Prob.'
-    })
+    return out.rename(columns={'company_name': 'Comparable company', 'sector': 'Sector', 'primary_fractional_cxo': 'Primary CXO', 'estimated_annual_savings_aed': 'Savings', 'expected_annual_contract_value_aed': 'Expected ACV', 'win_probability': 'Win Prob.'})
 
 
 def recommendation_text(row, filtered):
@@ -324,46 +305,37 @@ def recommendation_text(row, filtered):
 
 
 def profile_shell(row):
-    badges = f"""
-    <div class='badge-row'>
-        <div class='badge-pill'>Sector · {row['sector']}</div>
-        <div class='badge-pill'>Revenue band · {row['revenue_band']}</div>
-        <div class='badge-pill'>Account tier · {row['account_tier']}</div>
-        <div class='badge-pill'>Urgency · {row['urgency_tier']} ({row['urgency_score']:.1f})</div>
-        <div class='badge-pill'>Service mix · {row['service_mix']}</div>
-    </div>
-    """
-    st.markdown(
-        f"""
-        <div class='glass-card'>
-            <div class='section-kicker'>Selected company</div>
-            <div class='section-title'>{row['company_name']}</div>
-            <div class='section-copy'>This view is designed to help you pitch one company at a time by showing its executive need profile, cost advantage, portfolio position, and expansion path in a single narrative flow.</div>
-            {badges}
-            <div class='mini-stat-grid'>
-                <div class='mini-stat'><div class='label'>Primary CXO</div><div class='value'>{row['primary_fractional_cxo']}</div><div class='sub'>Lead recommendation for first engagement.</div></div>
-                <div class='mini-stat'><div class='label'>Secondary CXO</div><div class='value'>{row['secondary_fractional_cxo']}</div><div class='sub'>Best expansion role after the first intervention.</div></div>
-                <div class='mini-stat'><div class='label'>Expected LTV</div><div class='value'>{fmt_aed(row['expected_account_ltv_aed'])}</div><div class='sub'>Longer-term account value if the relationship expands well.</div></div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    badges = ''.join([
+        f"<div class='badge-pill'>Sector · {row['sector']}</div>",
+        f"<div class='badge-pill'>Revenue band · {row['revenue_band']}</div>",
+        f"<div class='badge-pill'>Account tier · {row['account_tier']}</div>",
+        f"<div class='badge-pill'>Urgency · {row['urgency_tier']} ({row['urgency_score']:.1f})</div>",
+        f"<div class='badge-pill'>Service mix · {row['service_mix']}</div>",
+    ])
+    stats_html = (
+        "<div class='mini-stat-grid'>"
+        f"<div class='mini-stat'><div class='label'>Primary CXO</div><div class='value'>{row['primary_fractional_cxo']}</div><div class='sub'>Lead recommendation for first engagement.</div></div>"
+        f"<div class='mini-stat'><div class='label'>Secondary CXO</div><div class='value'>{row['secondary_fractional_cxo']}</div><div class='sub'>Best expansion role after the first intervention.</div></div>"
+        f"<div class='mini-stat'><div class='label'>Expected LTV</div><div class='value'>{fmt_aed(row['expected_account_ltv_aed'])}</div><div class='sub'>Longer-term account value if the relationship expands well.</div></div>"
+        "</div>"
     )
+    html = (
+        "<div class='glass-card'>"
+        "<div class='section-kicker'>Selected company</div>"
+        f"<div class='section-title'>{row['company_name']}</div>"
+        "<div class='section-copy'>This view is designed to help you pitch one company at a time by showing its executive need profile, cost advantage, portfolio position, and expansion path in a single narrative flow.</div>"
+        f"<div class='badge-row'>{badges}</div>"
+        f"{stats_html}"
+        "</div>"
+    )
+    st.markdown(html, unsafe_allow_html=True)
 
 
 df = load_data()
 enable_altair_theme()
 inject_css()
 
-st.markdown(
-    """
-    <div class='hero-shell'>
-        <div class='hero-title'>Yalla CXO</div>
-        <div class='hero-sub'>Futuristic, company-first pitching dashboard for showing exactly why a given corporate should buy a fractional CXO solution, how much it can save versus full-time hiring, and where AI-supported expansion creates additional value.</div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+st.markdown("<div class='hero-shell'><div class='hero-title'>Yalla CXO</div><div class='hero-sub'>Futuristic, company-first pitching dashboard for showing exactly why a given corporate should buy a fractional CXO solution, how much it can save versus full-time hiring, and where AI-supported expansion creates additional value.</div></div>", unsafe_allow_html=True)
 
 with st.sidebar:
     st.header('Portfolio filters')
@@ -393,7 +365,7 @@ texts = recommendation_text(row, filtered)
 
 profile_shell(row)
 
-c1, c2, c3, c4, c5 = st.columns(5)
+c1, c2, c3, c4, c5 = st.columns(5, gap='medium')
 with c1:
     kpi_card('Annual savings', fmt_aed(row['estimated_annual_savings_aed']), 'Modeled cost reduction versus full-time executive hiring.')
 with c2:
@@ -411,12 +383,12 @@ tab1, tab2, tab3 = st.tabs(['Recommendation', 'Economics', 'Portfolio Context'])
 
 with tab1:
     section_header('Diagnostic', 'Lead with the right executive problem', 'The goal of this section is to make the recommendation feel evidence-based. It shows which executive need dominates, what operational signals support that conclusion, and what talking points should lead the meeting.')
-    a, b = st.columns([0.55, 0.45])
+    a, b = st.columns([0.55, 0.45], gap='large')
     with a:
         st.altair_chart(role_profile_chart(row), use_container_width=True)
     with b:
         st.altair_chart(operating_signal_chart(row), use_container_width=True)
-    i1, i2, i3 = st.columns(3)
+    i1, i2, i3 = st.columns(3, gap='large')
     with i1:
         insight_card('Primary recommendation', texts['lead'])
     with i2:
@@ -426,12 +398,12 @@ with tab1:
 
 with tab2:
     section_header('Economics', 'Make the savings case impossible to miss', 'This section is built to help you sell the financial logic in one glance: compare full-time executive cost versus the Yalla CXO hybrid model, then show how that savings path evolves over a 12-month horizon.')
-    a, b = st.columns(2)
+    a, b = st.columns(2, gap='large')
     with a:
         st.altair_chart(company_cost_chart(row), use_container_width=True)
     with b:
         st.altair_chart(savings_trajectory_chart(row), use_container_width=True)
-    i1, i2 = st.columns(2)
+    i1, i2 = st.columns(2, gap='large')
     with i1:
         insight_card('Economic justification', texts['economics'])
     with i2:
@@ -439,7 +411,7 @@ with tab2:
 
 with tab3:
     section_header('Positioning', 'Show where this company sits inside the broader opportunity map', 'This section helps you explain whether the selected company is a standout savings case, a standout revenue case, or a balanced priority. It also gives you a shortlist of comparable accounts for pattern-based storytelling.')
-    a, b = st.columns([0.58, 0.42])
+    a, b = st.columns([0.58, 0.42], gap='large')
     with a:
         st.altair_chart(peer_position_chart(filtered, row), use_container_width=True)
     with b:
