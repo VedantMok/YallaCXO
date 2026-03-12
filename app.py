@@ -9,175 +9,217 @@ def load_data():
     return pd.read_csv("fractional_cxo_dubai_top100_framework_ready.csv")
 
 
-def enable_altair_theme():
+def get_palette(mode: str):
+    if mode == "Light":
+        return {
+            "bg": "#F5F7FB",
+            "bg_grad_1": "rgba(61, 131, 255, 0.08)",
+            "bg_grad_2": "rgba(16, 185, 129, 0.08)",
+            "panel": "rgba(255,255,255,0.82)",
+            "panel_solid": "#FFFFFF",
+            "border": "rgba(15, 23, 42, 0.08)",
+            "text": "#102033",
+            "muted": "#5E738A",
+            "soft": "#E9EEF5",
+            "accent": "#2563EB",
+            "accent_2": "#14B8A6",
+            "accent_3": "#7C3AED",
+            "success": "#10B981",
+            "danger": "#F97316",
+            "pill_bg": "rgba(37, 99, 235, 0.06)",
+            "callout_start": "rgba(37, 99, 235, 0.08)",
+            "callout_end": "rgba(20, 184, 166, 0.08)",
+            "chart_text": "#102033",
+            "chart_label": "#4B6075",
+            "chart_grid": "rgba(15, 23, 42, 0.08)",
+            "hero_start": "#EAF2FF",
+            "hero_mid": "#F7FBFF",
+            "hero_end": "#EEFFFB",
+            "shadow": "0 16px 40px rgba(15,23,42,0.08)",
+            "metric_cost": "#64748B",
+            "metric_save": "#10B981",
+            "highlight": "#2563EB",
+        }
+    return {
+        "bg": "#0B1220",
+        "bg_grad_1": "rgba(37, 99, 235, 0.12)",
+        "bg_grad_2": "rgba(20, 184, 166, 0.10)",
+        "panel": "rgba(15, 23, 42, 0.72)",
+        "panel_solid": "#111827",
+        "border": "rgba(148, 163, 184, 0.14)",
+        "text": "#E8EEF8",
+        "muted": "#9FB0C5",
+        "soft": "#1E293B",
+        "accent": "#60A5FA",
+        "accent_2": "#2DD4BF",
+        "accent_3": "#A78BFA",
+        "success": "#34D399",
+        "danger": "#FB923C",
+        "pill_bg": "rgba(96, 165, 250, 0.08)",
+        "callout_start": "rgba(96, 165, 250, 0.10)",
+        "callout_end": "rgba(45, 212, 191, 0.10)",
+        "chart_text": "#E8EEF8",
+        "chart_label": "#AFC0D6",
+        "chart_grid": "rgba(148, 163, 184, 0.12)",
+        "hero_start": "#0F172A",
+        "hero_mid": "#111827",
+        "hero_end": "#10243B",
+        "shadow": "0 18px 46px rgba(2,6,23,0.34)",
+        "metric_cost": "#94A3B8",
+        "metric_save": "#34D399",
+        "highlight": "#60A5FA",
+    }
+
+
+def enable_altair_theme(p):
     def theme():
         return {
             "config": {
                 "background": "transparent",
                 "view": {"stroke": None},
-                "title": {"color": "#EAFEF3", "fontSize": 18, "font": "Space Grotesk", "anchor": "start", "fontWeight": 700},
+                "title": {
+                    "color": p["chart_text"],
+                    "fontSize": 18,
+                    "font": "Space Grotesk",
+                    "anchor": "start",
+                    "fontWeight": 700,
+                },
                 "axis": {
-                    "labelColor": "#B9D8C8",
-                    "titleColor": "#EAFEF3",
-                    "gridColor": "rgba(120,170,145,0.16)",
-                    "domainColor": "rgba(120,170,145,0.24)",
-                    "tickColor": "rgba(120,170,145,0.24)",
+                    "labelColor": p["chart_label"],
+                    "titleColor": p["chart_text"],
+                    "gridColor": p["chart_grid"],
+                    "domainColor": p["chart_grid"],
+                    "tickColor": p["chart_grid"],
                     "labelFont": "Inter",
                     "titleFont": "Inter",
                 },
                 "legend": {
-                    "labelColor": "#CDE8DA",
-                    "titleColor": "#EAFEF3",
+                    "labelColor": p["chart_label"],
+                    "titleColor": p["chart_text"],
                     "labelFont": "Inter",
                     "titleFont": "Inter",
                 },
-                "range": {"category": ["#00F5A0", "#00D9F5", "#7C5CFF", "#FF7BEA", "#FFC857", "#29E7CD"]},
+                "range": {
+                    "category": [p["accent"], p["accent_2"], p["accent_3"], p["success"], p["danger"], "#FBBF24"]
+                },
             }
         }
     try:
-        alt.themes.register("yalla_futuristic_fixed", theme)
+        alt.themes.register("yalla_dynamic_theme", theme)
     except Exception:
         pass
-    alt.themes.enable("yalla_futuristic_fixed")
+    alt.themes.enable("yalla_dynamic_theme")
 
 
-def inject_css():
-    st.markdown(
-        """
-        <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
-        html, body, [class*="css"] {font-family: 'Inter', sans-serif;}
-        .stApp {
-            background:
-                radial-gradient(circle at 10% 20%, rgba(0, 245, 160, 0.08), transparent 28%),
-                radial-gradient(circle at 90% 10%, rgba(0, 217, 245, 0.10), transparent 25%),
-                linear-gradient(180deg, #07120D 0%, #091B14 34%, #0C1612 100%);
-            color: #ECFFF4;
-        }
-        .block-container {padding-top: 1.15rem; padding-bottom: 2.2rem; max-width: 1420px;}
-        section[data-testid="stSidebar"] {
-            background: linear-gradient(180deg, rgba(8,19,14,0.98), rgba(9,27,20,0.96));
-            border-right: 1px solid rgba(123, 163, 140, 0.18);
-        }
-        .hero-shell {
-            background: linear-gradient(135deg, rgba(11,35,23,0.92) 0%, rgba(10,59,39,0.92) 42%, rgba(0,177,79,0.88) 100%);
-            border: 1px solid rgba(110, 220, 165, 0.24);
-            border-radius: 28px;
-            padding: 1.6rem 1.75rem 1.35rem 1.75rem;
-            box-shadow: 0 20px 54px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255,255,255,0.05);
-            margin-bottom: 1.15rem;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-shell:before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            transform: translateX(-100%);
-            animation: shimmer 7s infinite linear;
-        }
-        @keyframes shimmer {100% {transform: translateX(100%);}}
-        .hero-title {font-family: 'Space Grotesk', sans-serif; font-size: 2.3rem; font-weight: 700; margin: 0; color: #F4FFF9;}
-        .hero-sub {margin-top: .45rem; color: #D7FCE7; max-width: 980px; line-height: 1.6; font-size: 1rem;}
-        .glass-card {
-            background: linear-gradient(180deg, rgba(13,27,20,0.82), rgba(9,19,15,0.74));
-            border: 1px solid rgba(124, 169, 144, 0.18);
-            border-radius: 24px;
-            padding: 1.35rem 1.35rem 1.2rem 1.35rem;
-            box-shadow: 0 16px 36px rgba(0,0,0,0.18);
-            backdrop-filter: blur(12px);
-            margin-bottom: 1.05rem;
-        }
-        .badge-row {display:flex; gap:.6rem; flex-wrap:wrap; margin:.95rem 0 1.05rem 0;}
-        .badge-pill {
-            display:inline-flex; align-items:center; gap:.4rem; padding:.48rem .78rem;
-            background: rgba(255,255,255,0.07); color:#E9FFF4; border:1px solid rgba(190,255,223,0.12);
-            border-radius:999px; font-size:.83rem; line-height:1;
-        }
-        .section-kicker {font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: #8FD5B0; margin-bottom: .32rem;}
-        .section-title {font-family: 'Space Grotesk', sans-serif; color: #ECFFF4; font-size: 1.38rem; margin: .1rem 0 .18rem 0;}
-        .section-copy {color:#AFCFBE; line-height:1.58; margin-bottom:.95rem;}
-        .kpi-card {
-            background: linear-gradient(180deg, rgba(11,25,19,0.84), rgba(8,17,13,0.78));
-            border: 1px solid rgba(125, 167, 144, 0.17);
-            border-radius: 22px;
-            padding: 1rem 1rem .95rem 1rem;
-            min-height: 126px;
-            box-shadow: 0 14px 30px rgba(0,0,0,0.18);
-        }
-        .kpi-label {font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; color: #95C4AB; margin-bottom: .34rem;}
-        .kpi-value {font-family: 'Space Grotesk', sans-serif; font-size: 1.52rem; font-weight: 700; color: #F0FFF6; margin-bottom: .26rem; line-height:1.1;}
-        .kpi-sub {font-size: .84rem; color: #B8D8C6; line-height: 1.45;}
-        .mini-stat-grid {display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:.85rem; margin-top:.25rem;}
-        .mini-stat {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 18px;
-            padding: .95rem 1rem;
-            min-height: 108px;
-        }
-        .mini-stat .label {color:#8FC9AD; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em;}
-        .mini-stat .value {font-family:'Space Grotesk',sans-serif; color:#F2FFF8; font-size:1.15rem; margin-top:.22rem;}
-        .mini-stat .sub {color:#B6D4C4; font-size:.82rem; margin-top:.22rem; line-height:1.45;}
-        .callout-box {
-            background: linear-gradient(180deg, rgba(10,33,22,0.92), rgba(11,54,34,0.82));
-            border:1px solid rgba(0,245,160,0.18);
-            border-radius:22px;
-            padding:1rem 1.1rem;
-            margin:.8rem 0 1.15rem 0;
-            box-shadow:0 16px 32px rgba(0,0,0,0.18);
-            line-height:1.6;
-        }
-        .callout-box strong {color:#F2FFF8;}
-        .insight-box {
-            background: linear-gradient(180deg, rgba(10,22,16,0.84), rgba(8,17,13,0.76));
-            border:1px solid rgba(124,167,144,0.18);
-            border-left:4px solid #00F5A0;
-            border-radius:18px;
-            padding:1rem 1.02rem;
-            box-shadow:0 12px 28px rgba(0,0,0,0.16);
-            height:100%;
-        }
-        .insight-box h4 {margin:0 0 .45rem 0; color:#F1FFF8; font-size:1rem;}
-        .insight-box p {margin:0; color:#B9D8C8; line-height:1.56;}
-        .stTabs [data-baseweb="tab-list"] {gap: .55rem; margin-bottom: .4rem;}
-        .stTabs [data-baseweb="tab"] {
-            background: rgba(255,255,255,0.04);
-            border:1px solid rgba(130,170,150,0.12);
-            border-radius:14px;
-            color:#B8D8C6;
-            padding:.6rem 1rem;
-        }
-        .stTabs [aria-selected="true"] {
-            background: linear-gradient(180deg, rgba(0,245,160,0.14), rgba(0,217,245,0.14));
-            color:#F1FFF8;
-            border-color: rgba(0,245,160,0.32);
-        }
-        div[data-baseweb="select"] > div, div[data-baseweb="input"] > div {
-            background: rgba(255,255,255,0.04);
-            border-color: rgba(130,170,150,0.18);
-        }
-        div[data-testid="stDataFrame"] {
-            border:1px solid rgba(124,167,144,0.16);
-            border-radius:18px;
-            overflow:hidden;
-        }
-        div[data-testid="stMetric"] {
-            background: linear-gradient(180deg, rgba(11,25,19,0.84), rgba(8,17,13,0.78));
-            border: 1px solid rgba(125,167,144,0.17);
-            border-radius: 20px;
-            padding: .62rem .75rem;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.16);
-        }
-        @media (max-width: 1100px) {
-            .mini-stat-grid {grid-template-columns:1fr;}
-            .hero-title {font-size: 1.9rem;}
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+def inject_css(p):
+    st.markdown(f"""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
+    html, body, [class*="css"] {{font-family: 'Inter', sans-serif;}}
+    .stApp {{
+        background:
+            radial-gradient(circle at 10% 20%, {p['bg_grad_1']}, transparent 28%),
+            radial-gradient(circle at 90% 10%, {p['bg_grad_2']}, transparent 25%),
+            linear-gradient(180deg, {p['bg']} 0%, {p['bg']} 100%);
+        color: {p['text']};
+    }}
+    .block-container {{padding-top: 1.1rem; padding-bottom: 2rem; max-width: 1420px;}}
+    section[data-testid="stSidebar"] {{
+        background: {p['panel_solid']};
+        border-right: 1px solid {p['border']};
+    }}
+    .hero-shell {{
+        background: linear-gradient(135deg, {p['hero_start']} 0%, {p['hero_mid']} 55%, {p['hero_end']} 100%);
+        border: 1px solid {p['border']};
+        border-radius: 28px;
+        padding: 1.55rem 1.75rem 1.35rem 1.75rem;
+        box-shadow: {p['shadow']};
+        margin-bottom: 1.1rem;
+        position: relative;
+        overflow: hidden;
+    }}
+    .hero-shell:before {{
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+        transform: translateX(-100%);
+        animation: shimmer 8s infinite linear;
+    }}
+    @keyframes shimmer {{100% {{transform: translateX(100%);}}}}
+    .hero-title {{font-family: 'Space Grotesk', sans-serif; font-size: 2.28rem; font-weight: 700; margin: 0; color: {p['text']};}}
+    .hero-sub {{margin-top: .42rem; color: {p['muted']}; max-width: 980px; line-height: 1.6; font-size: 1rem;}}
+    .glass-card {{
+        background: {p['panel']};
+        border: 1px solid {p['border']};
+        border-radius: 24px;
+        padding: 1.35rem;
+        box-shadow: {p['shadow']};
+        backdrop-filter: blur(12px);
+        margin-bottom: 1.05rem;
+    }}
+    .badge-row {{display:flex; gap:.6rem; flex-wrap:wrap; margin:.95rem 0 1.05rem 0;}}
+    .badge-pill {{
+        display:inline-flex; align-items:center; gap:.4rem; padding:.5rem .82rem;
+        background: {p['pill_bg']}; color:{p['text']}; border:1px solid {p['border']};
+        border-radius:999px; font-size:.83rem; line-height:1;
+    }}
+    .section-kicker {{font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: {p['accent_2']}; margin-bottom: .32rem;}}
+    .section-title {{font-family: 'Space Grotesk', sans-serif; color: {p['text']}; font-size: 1.38rem; margin: .1rem 0 .18rem 0;}}
+    .section-copy {{color:{p['muted']}; line-height:1.58; margin-bottom:.95rem;}}
+    .kpi-card {{
+        background: {p['panel']};
+        border: 1px solid {p['border']};
+        border-radius: 22px;
+        padding: 1rem .95rem .92rem .95rem;
+        min-height: 126px;
+        box-shadow: {p['shadow']};
+    }}
+    .kpi-label {{font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; color: {p['muted']}; margin-bottom: .34rem;}}
+    .kpi-value {{font-family: 'Space Grotesk', sans-serif; font-size: 1.52rem; font-weight: 700; color: {p['text']}; margin-bottom: .26rem; line-height:1.1;}}
+    .kpi-sub {{font-size: .84rem; color: {p['muted']}; line-height: 1.45;}}
+    .mini-stat-grid {{display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:.85rem; margin-top:.25rem;}}
+    .mini-stat {{background: {p['pill_bg']}; border: 1px solid {p['border']}; border-radius: 18px; padding: .95rem 1rem; min-height: 108px;}}
+    .mini-stat .label {{color:{p['muted']}; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em;}}
+    .mini-stat .value {{font-family:'Space Grotesk',sans-serif; color:{p['text']}; font-size:1.15rem; margin-top:.22rem;}}
+    .mini-stat .sub {{color:{p['muted']}; font-size:.82rem; margin-top:.22rem; line-height:1.45;}}
+    .callout-box {{
+        background: linear-gradient(135deg, {p['callout_start']} 0%, {p['callout_end']} 100%);
+        border:1px solid {p['border']};
+        border-left: 4px solid {p['highlight']};
+        border-radius:22px;
+        padding:1rem 1.1rem;
+        margin:.8rem 0 1.15rem 0;
+        box-shadow: {p['shadow']};
+        line-height:1.6;
+        color: {p['text']};
+    }}
+    .callout-box strong {{color:{p['text']};}}
+    .insight-box {{
+        background: {p['panel']};
+        border:1px solid {p['border']};
+        border-left:4px solid {p['accent']};
+        border-radius:18px;
+        padding:1rem 1.02rem;
+        box-shadow:{p['shadow']};
+        height:100%;
+    }}
+    .insight-box h4 {{margin:0 0 .45rem 0; color:{p['text']}; font-size:1rem;}}
+    .insight-box p {{margin:0; color:{p['muted']}; line-height:1.56;}}
+    .stTabs [data-baseweb="tab-list"] {{gap: .55rem; margin-bottom: .4rem;}}
+    .stTabs [data-baseweb="tab"] {{
+        background: {p['panel']}; border:1px solid {p['border']}; border-radius:14px; color:{p['muted']}; padding:.6rem 1rem;
+    }}
+    .stTabs [aria-selected="true"] {{
+        background: linear-gradient(180deg, {p['callout_start']}, {p['callout_end']}); color:{p['text']}; border-color: {p['highlight']};
+    }}
+    div[data-baseweb="select"] > div, div[data-baseweb="input"] > div {{background: {p['panel']}; border-color: {p['border']};}}
+    div[data-testid="stDataFrame"] {{border:1px solid {p['border']}; border-radius:18px; overflow:hidden;}}
+    div[data-testid="stMetric"] {{background: {p['panel']}; border: 1px solid {p['border']}; border-radius: 20px; padding: .62rem .75rem; box-shadow: {p['shadow']};}}
+    label, .stSelectbox label, .stSlider label, .stMultiSelect label {{color:{p['text']} !important;}}
+    @media (max-width: 1100px) {{.mini-stat-grid {{grid-template-columns:1fr;}} .hero-title {{font-size: 1.9rem;}}}}
+    </style>
+    """, unsafe_allow_html=True)
 
 
 def fmt_aed(x):
@@ -215,21 +257,22 @@ def role_profile_chart(row):
         color=alt.Color('Role:N', title=''),
         tooltip=['Role', 'Need Score']
     )
-    text = alt.Chart(df).mark_text(align='left', dx=8, color='#E8FFF3', font='Inter', fontSize=12).encode(
+    text = alt.Chart(df).mark_text(align='left', dx=8, color=get_palette(st.session_state.get('appearance_mode', 'Dark'))['chart_text'], font='Inter', fontSize=12).encode(
         x='Need Score:Q', y=alt.Y('Role:N', sort=None), text=alt.Text('Need Score:Q', format='.1f')
     )
     return (bars + text).properties(title='Role fit and recommendation strength', height=300)
 
 
 def company_cost_chart(row):
+    p = get_palette(st.session_state.get('appearance_mode', 'Dark'))
     df = pd.DataFrame({'Model': ['Full-time executive stack', 'Yalla CXO hybrid model', 'Annual savings unlocked'], 'Value': [row['full_time_equivalent_cost_aed'], row['fractional_ai_solution_cost_aed'], row['estimated_annual_savings_aed']], 'Group': ['Cost', 'Cost', 'Savings']})
     bars = alt.Chart(df).mark_bar(cornerRadiusTopLeft=10, cornerRadiusTopRight=10, size=52).encode(
         x=alt.X('Model:N', title=''),
         y=alt.Y('Value:Q', title='Annual AED Value'),
-        color=alt.Color('Group:N', scale=alt.Scale(domain=['Cost', 'Savings'], range=['#4D5D59', '#00F5A0']), title=''),
+        color=alt.Color('Group:N', scale=alt.Scale(domain=['Cost', 'Savings'], range=[p['metric_cost'], p['metric_save']]), title=''),
         tooltip=['Model', alt.Tooltip('Value:Q', format=',.0f')]
     )
-    text = alt.Chart(df).mark_text(dy=-10, color='#E8FFF3', font='Inter', fontSize=11).encode(x='Model:N', y='Value:Q', text=alt.Text('Value:Q', format=',.0f'))
+    text = alt.Chart(df).mark_text(dy=-10, color=p['chart_text'], font='Inter', fontSize=11).encode(x='Model:N', y='Value:Q', text=alt.Text('Value:Q', format=',.0f'))
     return (bars + text).properties(title='Economic case versus full-time hiring', height=320)
 
 
@@ -248,24 +291,26 @@ def operating_signal_chart(row):
 
 
 def peer_position_chart(filtered, row):
+    p = get_palette(st.session_state.get('appearance_mode', 'Dark'))
     peers = filtered.copy()
     peers['selected'] = peers['company_name'].eq(row['company_name'])
     x_mid = peers['estimated_annual_savings_aed'].median()
     y_mid = peers['expected_annual_contract_value_aed'].median()
-    rules_x = alt.Chart(pd.DataFrame({'x': [x_mid]})).mark_rule(strokeDash=[6, 6], color='rgba(210,255,230,0.25)').encode(x='x:Q')
-    rules_y = alt.Chart(pd.DataFrame({'y': [y_mid]})).mark_rule(strokeDash=[6, 6], color='rgba(210,255,230,0.25)').encode(y='y:Q')
-    base = alt.Chart(peers).mark_circle(opacity=0.76, stroke='white', strokeWidth=0.6).encode(
+    rules_x = alt.Chart(pd.DataFrame({'x': [x_mid]})).mark_rule(strokeDash=[6, 6], color=p['chart_grid']).encode(x='x:Q')
+    rules_y = alt.Chart(pd.DataFrame({'y': [y_mid]})).mark_rule(strokeDash=[6, 6], color=p['chart_grid']).encode(y='y:Q')
+    base = alt.Chart(peers).mark_circle(opacity=0.78, stroke='white', strokeWidth=0.6).encode(
         x=alt.X('estimated_annual_savings_aed:Q', title='Estimated Annual Savings (AED)'),
         y=alt.Y('expected_annual_contract_value_aed:Q', title='Expected ACV (AED)'),
         size=alt.Size('win_probability:Q', title='Win Probability', scale=alt.Scale(range=[70, 900])),
-        color=alt.condition(alt.datum.selected, alt.value('#FF5D8F'), alt.Color('primary_fractional_cxo:N', title='Primary CXO')),
+        color=alt.condition(alt.datum.selected, alt.value(p['danger']), alt.Color('primary_fractional_cxo:N', title='Primary CXO')),
         tooltip=['company_name', 'sector', 'primary_fractional_cxo', 'secondary_fractional_cxo', 'estimated_annual_savings_aed', 'expected_annual_contract_value_aed', 'win_probability']
     )
-    label = alt.Chart(peers[peers['selected']]).mark_text(dx=8, dy=-8, color='#F4FFF9', font='Inter', fontSize=11).encode(x='estimated_annual_savings_aed:Q', y='expected_annual_contract_value_aed:Q', text='company_name:N')
+    label = alt.Chart(peers[peers['selected']]).mark_text(dx=8, dy=-8, color=p['chart_text'], font='Inter', fontSize=11).encode(x='estimated_annual_savings_aed:Q', y='expected_annual_contract_value_aed:Q', text='company_name:N')
     return (rules_x + rules_y + base + label).properties(title='Portfolio position of the selected company', height=360)
 
 
 def savings_trajectory_chart(row):
+    p = get_palette(st.session_state.get('appearance_mode', 'Dark'))
     months = list(range(1, 13))
     full_monthly = row['full_time_equivalent_cost_aed'] / 12
     yalla_monthly = row['fractional_ai_solution_cost_aed'] / 12
@@ -274,7 +319,7 @@ def savings_trajectory_chart(row):
     return alt.Chart(long).mark_line(point=True, strokeWidth=3).encode(
         x=alt.X('Month:O', title='Month'),
         y=alt.Y('Value:Q', title='Cumulative AED Cost'),
-        color=alt.Color('Path:N', scale=alt.Scale(domain=['Full-time cumulative cost', 'Yalla CXO cumulative cost'], range=['#FF7B72', '#00F5A0']), title=''),
+        color=alt.Color('Path:N', scale=alt.Scale(domain=['Full-time cumulative cost', 'Yalla CXO cumulative cost'], range=[p['danger'], p['success']]), title=''),
         tooltip=['Month', 'Path', alt.Tooltip('Value:Q', format=',.0f')]
     ).properties(title='12-month cost path comparison', height=320)
 
@@ -332,13 +377,23 @@ def profile_shell(row):
 
 
 df = load_data()
-enable_altair_theme()
-inject_css()
 
-st.markdown("<div class='hero-shell'><div class='hero-title'>Yalla CXO</div><div class='hero-sub'>Futuristic, company-first pitching dashboard for showing exactly why a given corporate should buy a fractional CXO solution, how much it can save versus full-time hiring, and where AI-supported expansion creates additional value.</div></div>", unsafe_allow_html=True)
+if 'appearance_mode' not in st.session_state:
+    st.session_state.appearance_mode = 'Dark'
 
 with st.sidebar:
     st.header('Portfolio filters')
+    light_toggle = st.toggle('Light mode', value=st.session_state.appearance_mode == 'Light')
+    st.session_state.appearance_mode = 'Light' if light_toggle else 'Dark'
+
+palette = get_palette(st.session_state.appearance_mode)
+enable_altair_theme(palette)
+inject_css(palette)
+
+st.markdown(f"<div class='hero-shell'><div class='hero-title'>Yalla CXO</div><div class='hero-sub'>Company-first pitching dashboard with a cleaner {st.session_state.appearance_mode.lower()} mode palette, better visual contrast, and a more polished executive feel for live demos.</div></div>", unsafe_allow_html=True)
+
+with st.sidebar:
+    st.caption(f"Appearance: {st.session_state.appearance_mode}")
     sectors = st.multiselect('Sector', sorted(df['sector'].unique()), default=sorted(df['sector'].unique()))
     roles = st.multiselect('Primary CXO', sorted(df['primary_fractional_cxo'].unique()), default=sorted(df['primary_fractional_cxo'].unique()))
     urgency = st.multiselect('Urgency Tier', sorted(df['urgency_tier'].unique()), default=sorted(df['urgency_tier'].unique()))
@@ -382,7 +437,7 @@ callout(f"<strong>Pitch recommendation for {row['company_name']}:</strong> {text
 tab1, tab2, tab3 = st.tabs(['Recommendation', 'Economics', 'Portfolio Context'])
 
 with tab1:
-    section_header('Diagnostic', 'Lead with the right executive problem', 'The goal of this section is to make the recommendation feel evidence-based. It shows which executive need dominates, what operational signals support that conclusion, and what talking points should lead the meeting.')
+    section_header('Diagnostic', 'Lead with the right executive problem', 'This section makes the recommendation feel evidence-based by showing the dominant executive need and the operating signals that support it.')
     a, b = st.columns([0.55, 0.45], gap='large')
     with a:
         st.altair_chart(role_profile_chart(row), use_container_width=True)
@@ -397,7 +452,7 @@ with tab1:
         insight_card('Expansion logic', texts['upsell'])
 
 with tab2:
-    section_header('Economics', 'Make the savings case impossible to miss', 'This section is built to help you sell the financial logic in one glance: compare full-time executive cost versus the Yalla CXO hybrid model, then show how that savings path evolves over a 12-month horizon.')
+    section_header('Economics', 'Make the savings case obvious', 'This section compares full-time executive cost versus the Yalla CXO hybrid model, then shows how the cost path diverges over 12 months.')
     a, b = st.columns(2, gap='large')
     with a:
         st.altair_chart(company_cost_chart(row), use_container_width=True)
@@ -410,7 +465,7 @@ with tab2:
         insight_card('Role benchmark', texts['benchmark'])
 
 with tab3:
-    section_header('Positioning', 'Show where this company sits inside the broader opportunity map', 'This section helps you explain whether the selected company is a standout savings case, a standout revenue case, or a balanced priority. It also gives you a shortlist of comparable accounts for pattern-based storytelling.')
+    section_header('Positioning', 'Show where this company sits in the broader opportunity map', 'This section shows whether the selected company is a standout savings case, a standout revenue case, or a balanced priority versus comparable accounts.')
     a, b = st.columns([0.58, 0.42], gap='large')
     with a:
         st.altair_chart(peer_position_chart(filtered, row), use_container_width=True)
