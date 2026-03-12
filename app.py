@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import streamlit as st
 import altair as alt
 
@@ -13,22 +12,18 @@ def load_data():
 def inject_css():
     st.markdown("""
     <style>
-    .main {background: linear-gradient(180deg, #F7FCF9 0%, #FFFFFF 30%);}    
-    .hero {background: linear-gradient(135deg, #083A21 0%, #0B6B3A 45%, #00B14F 100%); padding: 1.35rem 1.45rem; border-radius: 24px; color: white; box-shadow: 0 16px 36px rgba(0,177,79,.18); margin-bottom: 1rem;}
-    .hero h1 {margin:0; font-size:2.1rem;}
-    .hero p {margin:.38rem 0 0 0; opacity:.96; line-height:1.5;}
-    .callout {background:#F3FBF6; border:1px solid #DCEEE3; border-radius:18px; padding:1rem 1.05rem; margin:.4rem 0 .9rem 0;}
-    .callout strong {color:#0B6B3A;}
+    .main {background: linear-gradient(180deg, #F7FCF9 0%, #FFFFFF 32%);}    
+    .hero {background: linear-gradient(135deg, #083A21 0%, #0B6B3A 50%, #00B14F 100%); padding: 1.3rem 1.45rem; border-radius: 24px; color: white; box-shadow: 0 16px 36px rgba(0,177,79,.18); margin-bottom: 1rem;}
+    .hero h1 {margin:0; font-size:2.05rem;} .hero p {margin:.38rem 0 0 0; opacity:.96; line-height:1.5;}
+    .callout {background:#F3FBF6; border:1px solid #DCEEE3; border-radius:18px; padding:1rem 1.05rem; margin:.4rem 0 .9rem 0;} .callout strong {color:#0B6B3A;}
     .insight-box {background:#FFFFFF; border:1px solid #E2EFE8; border-left:5px solid #00B14F; border-radius:18px; padding:1rem 1rem .95rem 1rem; box-shadow:0 8px 18px rgba(0,0,0,.03); height:100%;}
-    .insight-box h4 {margin:.02rem 0 .4rem 0; color:#143524;}
-    .insight-box p {margin:0; color:#4B6658; line-height:1.55;}
-    .section-title {margin-top:.3rem; color:#143524;}
+    .insight-box h4 {margin:.02rem 0 .4rem 0; color:#143524;} .insight-box p {margin:0; color:#4B6658; line-height:1.55;}
     .decision-strip {display:grid; grid-template-columns:repeat(3,1fr); gap:.8rem; margin:.7rem 0 1rem 0;}
-    .decision-card {background:#FFFFFF; border:1px solid #E2EFE8; border-radius:18px; padding:1rem; box-shadow:0 8px 18px rgba(0,0,0,.03);}
-    .decision-card h5 {margin:0 0 .35rem 0; color:#607A6A; text-transform:uppercase; letter-spacing:.05em; font-size:.72rem;}
-    .decision-card h3 {margin:0 0 .35rem 0; color:#143524; font-size:1.2rem;}
+    .decision-card {background:#FFFFFF; border:1px solid #E2EFE8; border-radius:18px; padding:1rem; box-shadow:0 8px 18px rgba(0,0,0,.03);} 
+    .decision-card h5 {margin:0 0 .35rem 0; color:#607A6A; text-transform:uppercase; letter-spacing:.05em; font-size:.72rem;} 
+    .decision-card h3 {margin:0 0 .35rem 0; color:#143524; font-size:1.18rem;} 
     .decision-card p {margin:0; color:#4B6658; line-height:1.45; font-size:.92rem;}
-    .subtle {color:#607A6A; font-size:.92rem;}
+    .section-title {margin-top:.35rem; color:#143524;}
     div[data-testid="stMetric"] {background:#FFFFFF; border:1px solid #E2EFE8; border-radius:18px; padding:.55rem .65rem; box-shadow:0 8px 18px rgba(0,0,0,.03);}
     </style>
     """, unsafe_allow_html=True)
@@ -49,139 +44,119 @@ def insight_card(title, text):
     st.markdown(f"<div class='insight-box'><h4>{title}</h4><p>{text}</p></div>", unsafe_allow_html=True)
 
 
-def build_summary(filtered):
-    top_sector = filtered.groupby('sector', as_index=False).agg(weighted_pipeline=('weighted_pipeline_value_aed','sum')).sort_values('weighted_pipeline', ascending=False).iloc[0]
-    top_role = filtered['primary_fractional_cxo'].value_counts().idxmax()
-    top_account = filtered.sort_values('weighted_pipeline_value_aed', ascending=False).iloc[0]
-    roi_leader = filtered.sort_values('expected_roi_multiple', ascending=False).iloc[0]
-    return top_sector, top_role, top_account, roi_leader
+def role_profile_chart(row):
+    df = pd.DataFrame({
+        'Role':['CFO','CTO','CHRO','CMO','COO'],
+        'Need Score':[row['cfo_need_score'], row['cto_need_score'], row['chro_need_score'], row['cmo_need_score'], row['coo_need_score']]
+    }).sort_values('Need Score', ascending=False)
+    return alt.Chart(df).mark_bar(cornerRadiusTopLeft=8, cornerRadiusTopRight=8).encode(
+        x=alt.X('Role:N', title='CXO Role'),
+        y=alt.Y('Need Score:Q', title='Need Score'),
+        color=alt.Color('Role:N', title=''),
+        tooltip=['Role','Need Score']
+    ).properties(title='Why this company gets this recommendation', height=320)
 
 
-def compare_cost_chart(filtered):
-    full_time = filtered['full_time_equivalent_cost_aed'].sum()
-    solution = filtered['fractional_ai_solution_cost_aed'].sum()
-    savings = filtered['estimated_annual_savings_aed'].sum()
-    chart_df = pd.DataFrame({
-        'Cost Type': ['Full-time hiring model', 'Yalla CXO model', 'Annual savings unlocked'],
-        'Value': [full_time, solution, savings],
-        'Group': ['Cost', 'Cost', 'Savings']
+def company_cost_chart(row):
+    df = pd.DataFrame({
+        'Cost Type':['Full-time equivalent','Yalla CXO model','Annual savings'],
+        'Value':[row['full_time_equivalent_cost_aed'], row['fractional_ai_solution_cost_aed'], row['estimated_annual_savings_aed']],
+        'Group':['Cost','Cost','Savings']
     })
-    return alt.Chart(chart_df).mark_bar(cornerRadiusTopLeft=8, cornerRadiusTopRight=8).encode(
+    return alt.Chart(df).mark_bar(cornerRadiusTopLeft=8, cornerRadiusTopRight=8).encode(
         x=alt.X('Cost Type:N', title=''),
-        y=alt.Y('Value:Q', title='Annual AED Value'),
-        color=alt.Color('Group:N', scale=alt.Scale(domain=['Cost','Savings'], range=['#7F8C8D','#00B14F']), title=''),
-        tooltip=['Cost Type', alt.Tooltip('Value:Q', format=',.0f')]
-    ).properties(title='Cost comparison: full-time hiring vs Yalla CXO solution', height=360)
-
-
-def savings_bridge_chart(filtered):
-    full_time = filtered['full_time_equivalent_cost_aed'].sum()
-    solution = filtered['fractional_ai_solution_cost_aed'].sum()
-    savings = full_time - solution
-    bridge = pd.DataFrame({
-        'Step': ['Full-time cost base', 'Savings unlocked', 'Yalla CXO delivery cost'],
-        'Value': [full_time, savings, solution],
-        'Type': ['Base', 'Savings', 'Residual']
-    })
-    return alt.Chart(bridge).mark_bar(cornerRadiusTopLeft=8, cornerRadiusTopRight=8).encode(
-        x=alt.X('Step:N', title=''),
-        y=alt.Y('Value:Q', title='AED'),
-        color=alt.Color('Type:N', scale=alt.Scale(domain=['Base','Savings','Residual'], range=['#A0AEC0','#00B14F','#0B6B3A']), title=''),
-        tooltip=['Step', alt.Tooltip('Value:Q', format=',.0f')]
-    ).properties(title='Value bridge for the filtered opportunity set', height=360)
-
-
-def sector_role_heatmap(filtered):
-    role_cols = ['cfo_need_score','cto_need_score','chro_need_score','cmo_need_score','coo_need_score']
-    role_names = ['CFO','CTO','CHRO','CMO','COO']
-    h = filtered.groupby('sector')[role_cols].mean().reset_index()
-    h.columns = ['sector'] + role_names
-    melted = h.melt('sector', var_name='Role', value_name='Avg Need Score')
-    base = alt.Chart(melted).encode(x='Role:N', y=alt.Y('sector:N', sort='-color'))
-    heat = base.mark_rect().encode(
-        color=alt.Color('Avg Need Score:Q', scale=alt.Scale(scheme='yellowgreenblue')),
-        tooltip=['sector','Role', alt.Tooltip('Avg Need Score:Q', format='.1f')]
-    )
-    text = base.mark_text(size=11).encode(text=alt.Text('Avg Need Score:Q', format='.1f'))
-    return (heat + text).properties(title='Where each CXO role is most needed', height=420)
-
-
-def value_quadrant(filtered):
-    top = filtered.nlargest(min(12, len(filtered)), 'weighted_pipeline_value_aed').copy()
-    base = alt.Chart(filtered).mark_circle(opacity=0.78, stroke='white', strokeWidth=0.7).encode(
-        x=alt.X('estimated_annual_savings_aed:Q', title='Estimated Annual Savings (AED)'),
-        y=alt.Y('weighted_pipeline_value_aed:Q', title='Weighted Pipeline Value (AED)'),
-        size=alt.Size('expected_account_ltv_aed:Q', title='Expected LTV', scale=alt.Scale(range=[70, 1000])),
-        color=alt.Color('primary_fractional_cxo:N', title='Primary CXO'),
-        tooltip=['company_name','sector','primary_fractional_cxo','secondary_fractional_cxo','estimated_annual_savings_aed','weighted_pipeline_value_aed','expected_account_ltv_aed','win_probability']
-    )
-    labels = alt.Chart(top).mark_text(align='left', dx=7, dy=-6, fontSize=10, color='#143524').encode(
-        x='estimated_annual_savings_aed:Q', y='weighted_pipeline_value_aed:Q', text='company_name:N'
-    )
-    return (base + labels).properties(title='Which accounts are most sellable right now', height=420)
-
-
-def projection_chart(filtered):
-    proj = pd.DataFrame({
-        'Horizon': ['Current annual opportunity', '2-quarter forecast', 'Expected account LTV'],
-        'Value': [
-            filtered['expected_annual_contract_value_aed'].sum(),
-            filtered['forecast_2q_revenue_aed'].sum(),
-            filtered['expected_account_ltv_aed'].sum()
-        ],
-        'Metric': ['ACV','Forecast','LTV']
-    })
-    return alt.Chart(proj).mark_bar(cornerRadiusTopLeft=8, cornerRadiusTopRight=8).encode(
-        x='Horizon:N',
         y=alt.Y('Value:Q', title='AED Value'),
-        color=alt.Color('Metric:N', scale=alt.Scale(domain=['ACV','Forecast','LTV'], range=['#00B14F','#2F855A','#0B6B3A']), title=''),
-        tooltip=['Horizon', alt.Tooltip('Value:Q', format=',.0f')]
-    ).properties(title='Commercial projection from the filtered portfolio', height=360)
+        color=alt.Color('Group:N', scale=alt.Scale(domain=['Cost','Savings'], range=['#94A3B8','#00B14F']), title=''),
+        tooltip=['Cost Type', alt.Tooltip('Value:Q', format=',.0f')]
+    ).properties(title='Company-level cost comparison', height=320)
 
 
-def top_accounts_table(filtered, n=12):
-    cols = ['company_name','sector','primary_fractional_cxo','secondary_fractional_cxo','estimated_annual_savings_aed','expected_annual_contract_value_aed','expected_roi_multiple','ideal_next_action']
-    t = filtered.sort_values(['weighted_pipeline_value_aed','win_probability'], ascending=False)[cols].head(n).copy()
-    t['estimated_annual_savings_aed'] = t['estimated_annual_savings_aed'].map(fmt_aed)
-    t['expected_annual_contract_value_aed'] = t['expected_annual_contract_value_aed'].map(fmt_aed)
-    t['expected_roi_multiple'] = t['expected_roi_multiple'].round(2).astype(str) + 'x'
-    return t.rename(columns={
-        'company_name':'Company','sector':'Sector','primary_fractional_cxo':'Primary CXO','secondary_fractional_cxo':'Secondary CXO',
-        'estimated_annual_savings_aed':'Annual Savings','expected_annual_contract_value_aed':'Expected ACV','expected_roi_multiple':'ROI','ideal_next_action':'Best Next Action'
+def metric_snapshot_chart(row):
+    metrics = pd.DataFrame({
+        'Metric':['Revenue (AED bn)','Revenue growth %','Employee count','Digital maturity','Cash flow volatility','Process efficiency','Attrition %','Expected ROI x'],
+        'Value':[row['revenue_aed_bn'], row['revenue_growth_12m_pct'], row['employee_count'], row['digital_maturity_score'], row['cash_flow_volatility_score'], row['process_efficiency_score'], row['attrition_rate_pct'], row['expected_roi_multiple']]
+    })
+    return alt.Chart(metrics).mark_bar(cornerRadiusTopRight=8, cornerRadiusBottomRight=8).encode(
+        x=alt.X('Value:Q', title='Value'),
+        y=alt.Y('Metric:N', sort='-x', title=''),
+        tooltip=['Metric','Value']
+    ).properties(title='Company operating snapshot', height=340)
+
+
+def peer_position_chart(filtered, row):
+    peers = filtered.copy()
+    peers['selected'] = peers['company_name'].eq(row['company_name'])
+    base = alt.Chart(peers).mark_circle(opacity=0.75, stroke='white', strokeWidth=0.6).encode(
+        x=alt.X('estimated_annual_savings_aed:Q', title='Estimated Annual Savings (AED)'),
+        y=alt.Y('expected_annual_contract_value_aed:Q', title='Expected Annual Contract Value (AED)'),
+        size=alt.Size('win_probability:Q', title='Win Probability', scale=alt.Scale(range=[80, 900])),
+        color=alt.condition(alt.datum.selected, alt.value('#D62828'), alt.Color('primary_fractional_cxo:N', title='Primary CXO')),
+        tooltip=['company_name','sector','primary_fractional_cxo','secondary_fractional_cxo','estimated_annual_savings_aed','expected_annual_contract_value_aed','win_probability']
+    )
+    label_df = peers[peers['selected']]
+    labels = alt.Chart(label_df).mark_text(dx=8, dy=-8, fontSize=11, color='#143524').encode(
+        x='estimated_annual_savings_aed:Q', y='expected_annual_contract_value_aed:Q', text='company_name:N'
+    )
+    return (base + labels).properties(title='How this company compares with the filtered portfolio', height=360)
+
+
+def recommendation_text(row, filtered):
+    sector_rank = filtered.groupby('sector')['weighted_pipeline_value_aed'].sum().rank(ascending=False, method='dense')
+    sector_position = int(sector_rank[row['sector']]) if row['sector'] in sector_rank.index else None
+    return {
+        'lead': f"Lead with a {row['primary_fractional_cxo']}-first offer. This is the strongest modeled pain point for {row['company_name']}, while {row['secondary_fractional_cxo']} should be positioned as the natural expansion path once the first engagement proves value.",
+        'economics': f"The clearest buying argument is cost efficiency: the modeled executive bench would cost {fmt_aed(row['full_time_equivalent_cost_aed'])} under a full-time structure, versus {fmt_aed(row['fractional_ai_solution_cost_aed'])} through Yalla CXO, unlocking {fmt_aed(row['estimated_annual_savings_aed'])} in annual savings.",
+        'timing': f"This account carries a {row['win_probability']*100:.1f}% modeled win probability and an expected close time of {int(row['expected_close_days'])} days, which means it should be treated as a live commercial opportunity rather than a long-horizon prospect.",
+        'sector': f"{row['sector']} ranks #{sector_position} in weighted pipeline contribution within the current filter set, so this company can also serve as a sector-specific proof point in your broader Dubai go-to-market story.",
+        'upsell': f"After the primary engagement, the best expansion path is {row['secondary_fractional_cxo']} plus AI-supported roles: {row['ai_supported_roles']}. The expected next-service expansion window is {int(row['next_service_expansion_days'])} days."
+    }
+
+
+def top_comparables(filtered, row):
+    subset = filtered.copy()
+    subset['distance'] = (
+        (subset['revenue_aed_bn'] - row['revenue_aed_bn']).abs() * 2
+        + (subset['urgency_score'] - row['urgency_score']).abs() * 0.4
+        + (subset['expected_annual_contract_value_aed'] - row['expected_annual_contract_value_aed']).abs() / 500000
+    )
+    subset = subset[subset['company_name'] != row['company_name']].sort_values('distance').head(5)
+    out = subset[['company_name','sector','primary_fractional_cxo','estimated_annual_savings_aed','expected_annual_contract_value_aed','win_probability']].copy()
+    out['estimated_annual_savings_aed'] = out['estimated_annual_savings_aed'].map(fmt_aed)
+    out['expected_annual_contract_value_aed'] = out['expected_annual_contract_value_aed'].map(fmt_aed)
+    out['win_probability'] = (out['win_probability']*100).round(1).astype(str) + '%'
+    return out.rename(columns={
+        'company_name':'Comparable company','sector':'Sector','primary_fractional_cxo':'Primary CXO','estimated_annual_savings_aed':'Savings',
+        'expected_annual_contract_value_aed':'Expected ACV','win_probability':'Win Prob.'
     })
 
 
-def create_decision_cards(filtered):
-    top_sector, top_role, top_account, roi_leader = build_summary(filtered)
+def portfolio_recommendation_cards(row, filtered):
+    same_role = filtered[filtered['primary_fractional_cxo'] == row['primary_fractional_cxo']]
+    role_avg_save = same_role['estimated_annual_savings_aed'].mean()
+    role_avg_win = same_role['win_probability'].mean()
+    same_sector = filtered[filtered['sector'] == row['sector']]
+    sector_pipe = same_sector['weighted_pipeline_value_aed'].sum()
     html = f"""
     <div class='decision-strip'>
         <div class='decision-card'>
-            <h5>Go-to-market wedge</h5>
-            <h3>{top_role}-led offer</h3>
-            <p>This role appears most often as the primary recommendation, so the front-end pitch should anchor around {top_role}-level value and keep other CXO services as add-on pathways.</p>
+            <h5>Primary pitch</h5>
+            <h3>{row['primary_fractional_cxo']}-led entry</h3>
+            <p>Use this role as the lead offer for {row['company_name']} because it has the highest modeled need score and creates the clearest justification for intervention.</p>
         </div>
         <div class='decision-card'>
-            <h5>Best first sector</h5>
-            <h3>{top_sector['sector']}</h3>
-            <p>This sector contributes {fmt_aed(top_sector['weighted_pipeline'])} in weighted pipeline inside the current filter set, making it the best sector for initial sales focus.</p>
+            <h5>Economic proof</h5>
+            <h3>{fmt_aed(row['estimated_annual_savings_aed'])} saved</h3>
+            <p>This company shows a {row['estimated_savings_pct']:.1f}% modeled savings gap versus full-time executive hiring, which is the strongest commercial anchor for the conversation.</p>
         </div>
         <div class='decision-card'>
-            <h5>Best showcase account</h5>
-            <h3>{top_account['company_name']}</h3>
-            <p>Use this account as the story-led proof point: strong weighted pipeline, clear savings case, and a {top_account['win_probability']*100:.1f}% modeled win probability.</p>
+            <h5>Expansion path</h5>
+            <h3>{row['secondary_fractional_cxo']} + AI add-ons</h3>
+            <p>After the first engagement, move into the secondary role and the AI-supported operating layer to expand contract value without needing a full additional executive bench.</p>
         </div>
     </div>
     """
     st.markdown(html, unsafe_allow_html=True)
-    return top_sector, top_role, top_account, roi_leader
-
-
-def account_recommendation_panel(row):
-    st.markdown(f"""
-    <div class='callout'>
-        <strong>How to pitch this company:</strong> Lead with a <strong>{row['primary_fractional_cxo']}</strong> solution because that is the highest modeled need. Position <strong>{row['secondary_fractional_cxo']}</strong> as the expansion path, anchor the conversation on <strong>{fmt_aed(row['estimated_annual_savings_aed'])}</strong> in modeled savings versus full-time hiring, and use AI add-ons to reduce delivery cost without sacrificing breadth.
-    </div>
-    """, unsafe_allow_html=True)
+    return role_avg_save, role_avg_win, sector_pipe
 
 
 df = load_data()
@@ -190,7 +165,7 @@ inject_css()
 st.markdown("""
 <div class='hero'>
     <h1>Yalla CXO</h1>
-    <p>One-page executive selling dashboard for showing where fractional CXO services fit best, which accounts should be targeted first, and how the Yalla CXO model saves money compared with full-time executive hiring.</p>
+    <p>Company-first executive dashboard for pitching one corporate at a time: diagnose the need, quantify the savings versus full-time hiring, recommend the right fractional CXO, and show the expansion path through secondary roles and AI-supported delivery.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -216,104 +191,73 @@ if filtered.empty:
     st.warning('No companies match the current filters.')
     st.stop()
 
-top_sector, top_role, top_account, roi_leader = create_decision_cards(filtered)
+company = st.selectbox('Choose a company to pitch', filtered.sort_values('company_name')['company_name'].tolist())
+row = filtered.loc[filtered['company_name'] == company].iloc[0]
+texts = recommendation_text(row, filtered)
+role_avg_save, role_avg_win, sector_pipe = portfolio_recommendation_cards(row, filtered)
 
 k1, k2, k3, k4, k5 = st.columns(5)
-k1.metric('Target accounts', f"{len(filtered)}")
-k2.metric('Annual full-time cost base', fmt_aed(filtered['full_time_equivalent_cost_aed'].sum()))
-k3.metric('Yalla CXO delivery cost', fmt_aed(filtered['fractional_ai_solution_cost_aed'].sum()))
-k4.metric('Modeled annual savings', fmt_aed(filtered['estimated_annual_savings_aed'].sum()))
-k5.metric('Average ROI multiple', f"{filtered['expected_roi_multiple'].mean():.2f}x")
+k1.metric('Primary CXO', row['primary_fractional_cxo'])
+k2.metric('Secondary CXO', row['secondary_fractional_cxo'])
+k3.metric('Annual savings', fmt_aed(row['estimated_annual_savings_aed']))
+k4.metric('Expected ACV', fmt_aed(row['expected_annual_contract_value_aed']))
+k5.metric('Win probability', f"{row['win_probability']*100:.1f}%")
 
-st.markdown(
-    f"<div class='callout'><strong>Executive recommendation:</strong> Start with a {top_role}-led proposition, focus first on {top_sector['sector']}, and use {top_account['company_name']} as the anchor case study. Across the current portfolio, the Yalla CXO model reduces modeled annual cost from {fmt_aed(filtered['full_time_equivalent_cost_aed'].sum())} under full-time hiring to {fmt_aed(filtered['fractional_ai_solution_cost_aed'].sum())}, unlocking {fmt_aed(filtered['estimated_annual_savings_aed'].sum())} in annual savings.</div>",
-    unsafe_allow_html=True
-)
+st.markdown(f"<div class='callout'><strong>Recommendation for {row['company_name']}:</strong> {texts['lead']} {texts['economics']}</div>", unsafe_allow_html=True)
 
-st.markdown("<h3 class='section-title'>1. Show the economic case clearly</h3>", unsafe_allow_html=True)
-c1, c2 = st.columns(2)
+st.markdown("<h3 class='section-title'>1. Company profile and commercial recommendation</h3>", unsafe_allow_html=True)
+c1, c2 = st.columns([0.56, 0.44])
 with c1:
-    st.altair_chart(compare_cost_chart(filtered), use_container_width=True)
-    st.caption('This chart makes the buying case simple: compare the cost of hiring the equivalent executive bench full time versus using one primary fractional CXO, one secondary layer, and AI-supported delivery.')
-with c2:
-    st.altair_chart(savings_bridge_chart(filtered), use_container_width=True)
-    st.caption('Use this value bridge to explain that savings are not an abstract benefit; they are the gap between the traditional executive staffing model and the Yalla CXO operating model.')
-
-i1, i2 = st.columns(2)
-with i1:
-    insight_card('Why this saves money', f"The current filtered portfolio would cost {fmt_aed(filtered['full_time_equivalent_cost_aed'].sum())} under a full-time executive structure, versus {fmt_aed(filtered['fractional_ai_solution_cost_aed'].sum())} under Yalla CXO. That creates {fmt_aed(filtered['estimated_annual_savings_aed'].sum())} in modeled annual savings.")
-with i2:
-    insight_card('How to frame the pitch', f"Do not sell this as a cheaper alternative alone. Sell it as a sharper deployment model: one high-priority human CXO, one expansion-ready secondary role, and AI-supported execution for adjacent needs.")
-
-st.markdown("<h3 class='section-title'>2. Show where the best demand sits</h3>", unsafe_allow_html=True)
-c3, c4 = st.columns([1.1, 0.9])
-with c3:
-    st.altair_chart(value_quadrant(filtered), use_container_width=True)
-    st.caption(f"Accounts in the upper-right are your best live selling opportunities because they combine stronger savings with stronger weighted pipeline value. {top_account['company_name']} is currently the clearest example in the selected portfolio.")
-with c4:
-    st.altair_chart(sector_role_heatmap(filtered), use_container_width=True)
-    heat = filtered.groupby('sector')[['cfo_need_score','cto_need_score','chro_need_score','cmo_need_score','coo_need_score']].mean().stack().sort_values(ascending=False)
-    hotspot = heat.index[0]
-    st.caption(f"Most actionable hotspot: {hotspot[0]} shows the strongest average demand for {hotspot[1].replace('_need_score','').upper()}. That is where sector-specific messaging should start.")
-
-i3, i4 = st.columns(2)
-with i3:
-    insight_card('What to prioritize first', f"Lead generation should start with {top_sector['sector']} because it carries the strongest weighted pipeline concentration. Within that sector, lead with {top_role} pain as the opening commercial narrative.")
-with i4:
-    insight_card('How to package the solution', 'Build the offer as a primary CXO-led intervention with secondary expansion and AI-supported delivery. This makes the proposition easier to understand and easier to buy than a broad multi-executive consulting pitch.')
-
-st.markdown("<h3 class='section-title'>3. Show the forward revenue projection</h3>", unsafe_allow_html=True)
-c5, c6 = st.columns([0.95, 1.05])
-with c5:
-    st.altair_chart(projection_chart(filtered), use_container_width=True)
-    st.caption('This projection converts the opportunity set into a commercial story: current annual contract potential, near-term forecast, and longer-term lifetime value.')
-with c6:
-    top_table = top_accounts_table(filtered, 12)
-    st.subheader('Best accounts to pitch now')
-    st.dataframe(top_table, use_container_width=True, hide_index=True)
-
-i5, i6 = st.columns(2)
-with i5:
-    insight_card('Best showcase company', f"{top_account['company_name']} should be used as the flagship example because it combines a strong savings case, attractive contract value, and a clear next action of '{top_account['ideal_next_action']}'.")
-with i6:
-    insight_card('Best ROI proof point', f"{roi_leader['company_name']} has the strongest modeled ROI at {roi_leader['expected_roi_multiple']:.2f}x. Use accounts like this when the buyer is cost-sensitive and needs a rapid economic justification.")
-
-st.markdown("<h3 class='section-title'>4. Turn the page into a live pitch tool</h3>", unsafe_allow_html=True)
-selected = st.selectbox('Select a company to personalize the pitch', filtered.sort_values('company_name')['company_name'].tolist(), index=0)
-row = filtered.loc[filtered['company_name'] == selected].iloc[0]
-account_recommendation_panel(row)
-
-c7, c8 = st.columns([0.55, 0.45])
-with c7:
     st.markdown(f"""
     ### {row['company_name']}
     **Sector:** {row['sector']}  
-    **Primary CXO to lead with:** {row['primary_fractional_cxo']}  
-    **Secondary expansion path:** {row['secondary_fractional_cxo']}  
-    **Expected ACV:** {fmt_aed(row['expected_annual_contract_value_aed'])}  
+    **Revenue band:** {row['revenue_band']}  
+    **Account tier:** {row['account_tier']}  
+    **Urgency:** {row['urgency_tier']} ({row['urgency_score']:.1f})  
+    **Service mix:** {row['service_mix']}  
     **Expected LTV:** {fmt_aed(row['expected_account_ltv_aed'])}  
-    **Modeled annual savings:** {fmt_aed(row['estimated_annual_savings_aed'])} ({row['estimated_savings_pct']:.1f}%)  
-    **Win probability:** {row['win_probability']*100:.1f}%  
     **Ideal next action:** {row['ideal_next_action']}  
     **AI-supported roles:** {row['ai_supported_roles']}  
     **AI add-ons:** {row['ai_agent_addons']}
     """)
-    role_scores = pd.DataFrame({'Role':['CFO','CTO','CHRO','CMO','COO'], 'Need Score':[row['cfo_need_score'],row['cto_need_score'],row['chro_need_score'],row['cmo_need_score'],row['coo_need_score']]})
-    role_scores = role_scores.sort_values('Need Score', ascending=False)
-    role_chart = alt.Chart(role_scores).mark_bar(cornerRadiusTopLeft=8, cornerRadiusTopRight=8).encode(
-        x='Role:N', y=alt.Y('Need Score:Q', title='Need Score'), color='Role:N', tooltip=['Role','Need Score']
-    ).properties(title='Why this company gets this recommendation', height=320)
-    st.altair_chart(role_chart, use_container_width=True)
+    insight_card('Why this recommendation fits', texts['lead'])
+    insight_card('Why the buyer should care now', texts['timing'])
+with c2:
+    st.altair_chart(role_profile_chart(row), use_container_width=True)
+    st.caption('This chart shows which executive pain is strongest for the selected company, so you can justify why the recommended primary role should lead the conversation.')
+
+st.markdown("<h3 class='section-title'>2. Economic case versus full-time hiring</h3>", unsafe_allow_html=True)
+c3, c4 = st.columns([0.5, 0.5])
+with c3:
+    st.altair_chart(company_cost_chart(row), use_container_width=True)
+    st.caption('Use this chart in the pitch to make the savings argument visible in one glance: full-time executive cost base versus the Yalla CXO model and the savings gap created between them.')
+with c4:
+    st.altair_chart(metric_snapshot_chart(row), use_container_width=True)
+    st.caption('These metrics explain the business context behind the recommendation, so the solution appears diagnostic and specific rather than generic.')
+
+i1, i2 = st.columns(2)
+with i1:
+    insight_card('Economic justification', texts['economics'])
+with i2:
+    insight_card('Commercial benchmark', f"Across companies with a primary {row['primary_fractional_cxo']} recommendation in the current filtered set, the average modeled savings is {fmt_aed(role_avg_save)} and the average win probability is {role_avg_win*100:.1f}%.")
+
+st.markdown("<h3 class='section-title'>3. Portfolio context: where this company sits</h3>", unsafe_allow_html=True)
+c5, c6 = st.columns([0.58, 0.42])
+with c5:
+    st.altair_chart(peer_position_chart(filtered, row), use_container_width=True)
+    st.caption(f"The selected company is highlighted in red. This shows whether it is a strong savings story, a strong revenue story, or both relative to the rest of the filtered portfolio.")
+with c6:
+    insight_card('Sector positioning', texts['sector'])
+    insight_card('Expansion path', texts['upsell'])
+    insight_card('Sector-level sales relevance', f"The selected company sits inside a sector contributing {fmt_aed(sector_pipe)} in weighted pipeline value within the current portfolio filter, which means it can also be used as a sector proof point during broader business development.")
+
+st.markdown("<h3 class='section-title'>4. Suggested pitch support</h3>", unsafe_allow_html=True)
+c7, c8 = st.columns([0.54, 0.46])
+with c7:
+    st.subheader('Closest comparable accounts')
+    st.dataframe(top_comparables(filtered, row), use_container_width=True, hide_index=True)
 with c8:
-    one_company = pd.DataFrame({
-        'Cost Type':['Full-time equivalent','Yalla CXO model','Savings'],
-        'Value':[row['full_time_equivalent_cost_aed'], row['fractional_ai_solution_cost_aed'], row['estimated_annual_savings_aed']],
-        'Type':['Base','Residual','Savings']
-    })
-    single_cost = alt.Chart(one_company).mark_bar(cornerRadiusTopLeft=8, cornerRadiusTopRight=8).encode(
-        x='Cost Type:N', y=alt.Y('Value:Q', title='AED'), color=alt.Color('Type:N', scale=alt.Scale(domain=['Base','Residual','Savings'], range=['#94A3B8','#0B6B3A','#00B14F']), title=''), tooltip=['Cost Type', alt.Tooltip('Value:Q', format=',.0f')]
-    ).properties(title='Company-level cost story', height=320)
-    st.altair_chart(single_cost, use_container_width=True)
-    insight_card('Suggested talk track', f"Open with the savings delta of {fmt_aed(row['estimated_annual_savings_aed'])}, then explain why {row['primary_fractional_cxo']} is the lead role today. After that, position {row['secondary_fractional_cxo']} and the AI add-ons as the low-friction expansion path once the first intervention proves value.")
+    insight_card('Suggested talk track', f"Start with the {row['primary_fractional_cxo']}-led need, quantify the savings delta of {fmt_aed(row['estimated_annual_savings_aed'])}, then explain how {row['secondary_fractional_cxo']} and AI-supported roles create a broader executive operating model without full-time hiring overhead.")
+    insight_card('What to ask in the meeting', f"Confirm whether the company is currently feeling the pain captured in the top two role scores. If yes, use that to move from a diagnostic conversation into a scoped proposal and pilot discussion around {row['ideal_next_action'].lower()}.")
 
 st.download_button('Download filtered dataset', filtered.to_csv(index=False).encode('utf-8'), file_name='yalla_cxo_filtered.csv', mime='text/csv')
