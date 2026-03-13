@@ -271,12 +271,13 @@ def portfolio_heatmap(filtered):
     return (heat + text).properties(title="Sector x role demand", height=320)
 
 
-def map_view(filtered):
+def map_view(filtered, row):
     if "latitude" not in filtered.columns or "longitude" not in filtered.columns:
         st.info("No map columns found.")
         return
 
-    m = filtered[["company_name", "latitude", "longitude", "weighted_acv", "primary_role_derived", "hq_zone"]].dropna().copy()
+    keep_cols = ["company_name", "latitude", "longitude", "weighted_acv", "primary_role_derived", "hq_zone"]
+    m = filtered[keep_cols].dropna().copy()
     if m.empty:
         st.info("No map-ready rows available.")
         return
@@ -289,34 +290,57 @@ def map_view(filtered):
         st.info("Map coordinates are invalid after cleaning.")
         return
 
+    selected_name = row["company_name"]
+    m["is_selected"] = m["company_name"].eq(selected_name)
     max_val = max(float(m["weighted_acv"].max()), 1.0)
-    m["radius"] = ((m["weighted_acv"] / max_val) * 6000 + 250).clip(250, 2200)
+    m["radius"] = ((m["weighted_acv"] / max_val) * 4500 + 220).clip(220, 1500)
 
-    st.caption("Smaller circles and a flat map view make the Dubai clusters readable.")
+    selected = m[m["is_selected"]].copy()
+    others = m[~m["is_selected"]].copy()
+    if selected.empty:
+        selected = m.head(1).copy()
+
+    center_lat = float(selected["latitude"].iloc[0])
+    center_lon = float(selected["longitude"].iloc[0])
 
     deck = pdk.Deck(
         map_style="light",
         initial_view_state=pdk.ViewState(
-            latitude=float(m["latitude"].mean()),
-            longitude=float(m["longitude"].mean()),
-            zoom=10.4,
+            latitude=center_lat,
+            longitude=center_lon,
+            zoom=10.6,
             pitch=0,
+            bearing=0,
         ),
         layers=[
             pdk.Layer(
                 "ScatterplotLayer",
-                data=m,
+                data=others,
                 get_position='[longitude, latitude]',
                 get_radius='radius',
                 radius_units='meters',
-                radius_min_pixels=4,
-                radius_max_pixels=18,
-                get_fill_color='[37, 99, 235, 140]',
-                get_line_color='[255,255,255,180]',
+                radius_min_pixels=3,
+                radius_max_pixels=12,
+                get_fill_color='[148, 163, 184, 90]',
+                get_line_color='[255,255,255,120]',
                 line_width_min_pixels=1,
+                pickable=False,
+                stroked=True,
+            ),
+            pdk.Layer(
+                "ScatterplotLayer",
+                data=selected,
+                get_position='[longitude, latitude]',
+                get_radius='radius * 1.6',
+                radius_units='meters',
+                radius_min_pixels=8,
+                radius_max_pixels=20,
+                get_fill_color='[239, 68, 68, 210]',
+                get_line_color='[255,255,255,255]',
+                line_width_min_pixels=2,
                 pickable=True,
                 stroked=True,
-            )
+            ),
         ],
         tooltip={
             "html": "<b>{company_name}</b><br/>Zone: {hq_zone}<br/>Primary role: {primary_role_derived}<br/>Weighted ACV: {weighted_acv}",
@@ -324,6 +348,7 @@ def map_view(filtered):
         },
     )
     st.pydeck_chart(deck, use_container_width=True)
+    st.caption(f"Static Dubai map centered on {selected_name}. The selected company is highlighted in red.")
 
 
 def pipeline_chart(filtered):
@@ -384,6 +409,10 @@ def main():
         st.warning("No companies match the current main-screen filters.")
         st.stop()
 
+    section_open("Dubai map", "This map stays fixed under the company selector and highlights the currently selected company.")
+    map_view(filtered, row)
+    section_close()
+
     hero(row)
 
     m1, m2, m3, m4, m5, m6 = st.columns(6, gap="medium")
@@ -400,7 +429,7 @@ def main():
     with m6:
         metric_card("Priority index", f"{row['priority_index']:.1f}", f"Band: {row['priority_band']}")
 
-    t1, t2, t3, t4, t5 = st.tabs(["Overview", "Portfolio", "Service Design", "Pipeline", "Map"])
+    t1, t2, t3, t4 = st.tabs(["Overview", "Portfolio", "Service Design", "Pipeline"])
 
     with t1:
         section_open("Executive overview", "Start with the selected company, then compare it against the strongest opportunities in the current filtered portfolio.")
@@ -454,11 +483,6 @@ def main():
             st.altair_chart(pipeline_chart(filtered), use_container_width=True)
         with b:
             st.altair_chart(funnel(row), use_container_width=True)
-        section_close()
-
-    with t5:
-        section_open("Dubai map", "The dataset has been enriched with synthetic Dubai zone, city, country, and latitude/longitude fields so the portfolio can be viewed geographically.")
-        map_view(filtered)
         section_close()
 
     st.download_button(
