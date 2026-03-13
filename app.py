@@ -156,19 +156,15 @@ def section_close():
 
 def company_selector(df):
     c1, c2, c3, c4 = st.columns([1.8, 1.1, 1.1, 1.2], gap="medium")
-    with c1:
-        companies = sorted(df["company_name"].tolist())
-        if "selected_company_main" not in st.session_state or st.session_state.selected_company_main not in companies:
-            st.session_state.selected_company_main = companies[0]
-        selected = st.selectbox("Selected company", companies, index=companies.index(st.session_state.selected_company_main), key="selected_company_main")
     with c2:
         sector_options = ["All"] + sorted(df["sector"].dropna().unique().tolist())
-        sector = st.selectbox("Sector filter", sector_options, index=0)
+        sector = st.selectbox("Sector filter", sector_options, index=0, key="sector_filter_main")
     with c3:
         role_options = ["All"] + list(ROLE_COLS.keys())
-        role = st.selectbox("Primary role filter", role_options, index=0)
+        role = st.selectbox("Primary role filter", role_options, index=0, key="role_filter_main")
     with c4:
-        min_win = st.slider("Min win probability", 0.0, 1.0, 0.0, 0.01)
+        min_win = st.slider("Min win probability", 0.0, 1.0, 0.0, 0.01, key="min_win_main")
+
     filtered = df.copy()
     if sector != "All":
         filtered = filtered[filtered["sector"] == sector]
@@ -177,10 +173,13 @@ def company_selector(df):
     filtered = filtered[filtered["win_probability"] >= min_win].copy()
     if filtered.empty:
         return None, None
-    companies2 = sorted(filtered["company_name"].tolist())
-    if selected not in companies2:
-        selected = companies2[0]
-        st.session_state.selected_company_main = selected
+
+    companies = sorted(filtered["company_name"].tolist())
+    current = st.session_state.get("selected_company_main")
+    default_index = companies.index(current) if current in companies else 0
+    with c1:
+        selected = st.selectbox("Selected company", companies, index=default_index, key="selected_company_main")
+
     row = filtered.loc[filtered["company_name"] == selected].iloc[0]
     return filtered, row
 
