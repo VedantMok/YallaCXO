@@ -528,7 +528,7 @@ with st.expander('Setup: company, filters, and appearance', expanded=False):
         light = st.toggle('Light mode', value=st.session_state.appearance_mode == 'Light')
         st.session_state.appearance_mode = 'Light' if light else 'Dark'
     with c3:
-        if st.button('Reset all filters', use_container_width=True):
+        if st.button('Reset all filters', width='stretch'):
             reset_filters(df)
             st.rerun()
     f1, f2, f3, f4 = st.columns(4, gap='large')
@@ -557,16 +557,19 @@ available = sorted(filtered['company_name'].tolist())
 if st.session_state.selected_company not in available:
     st.session_state.selected_company = available[0]
 
+def _on_company_change():
+    st.session_state.selected_company = st.session_state._company_sel
+
 sel, prev_col, next_col = st.columns([6.4, 0.8, 0.8], gap='medium')
+idx = available.index(st.session_state.selected_company) if st.session_state.selected_company in available else 0
 with sel:
-    st.selectbox('Selected company', available, key='selected_company', label_visibility='collapsed')
-idx = available.index(st.session_state.selected_company)
+    st.selectbox('Selected company', available, index=idx, key='_company_sel', label_visibility='collapsed', on_change=_on_company_change)
 with prev_col:
-    if st.button('◀', use_container_width=True, disabled=idx == 0):
+    if st.button('◀', width='stretch', disabled=idx == 0):
         st.session_state.selected_company = available[idx - 1]
         st.rerun()
 with next_col:
-    if st.button('▶', use_container_width=True, disabled=idx == len(available) - 1):
+    if st.button('▶', width='stretch', disabled=idx == len(available) - 1):
         st.session_state.selected_company = available[idx + 1]
         st.rerun()
 
@@ -606,14 +609,14 @@ with t1:
     section_header('Impact story', 'Show the economic upside before anything else', 'This tab is built to make a reader feel the cost of delay. It quantifies where the value comes from, how much is realistic, and how quickly it can be realized.')
     a, b = st.columns([0.54, 0.46], gap='large')
     with a:
-        st.altair_chart(impact_stack_chart(model, palette), use_container_width=True)
+        st.altair_chart(impact_stack_chart(model, palette), width='stretch')
     with b:
-        st.altair_chart(scenario_chart(model, palette), use_container_width=True)
+        st.altair_chart(scenario_chart(model, palette), width='stretch')
     c, d = st.columns(2, gap='large')
     with c:
-        st.altair_chart(value_realization_chart(row, model, palette), use_container_width=True)
+        st.altair_chart(value_realization_chart(row, model, palette), width='stretch')
     with d:
-        st.altair_chart(cost_vs_return_chart(row, model, palette), use_container_width=True)
+        st.altair_chart(cost_vs_return_chart(row, model, palette), width='stretch')
     i1, i2, i3 = st.columns(3, gap='large')
     with i1:
         insight_card('Budget argument', f"The buyer is not comparing the solution to zero. They are comparing it to the cost of status quo, which includes {fmt_aed(row['full_time_equivalent_cost_aed'])} in full-time executive cost and slower value capture.")
@@ -626,14 +629,14 @@ with t2:
     section_header('Problem proof', 'Represent the problem so clearly that the solution feels inevitable', 'This tab connects pain signals, role fit, capability gaps, and portfolio ranking. The goal is to show what is broken, where it is broken, and why this startup is the right response.')
     a, b = st.columns([0.5, 0.5], gap='large')
     with a:
-        st.altair_chart(proof_heatmap(row), use_container_width=True)
+        st.altair_chart(proof_heatmap(row), width='stretch')
     with b:
-        st.altair_chart(before_after_chart(row, palette), use_container_width=True)
+        st.altair_chart(before_after_chart(row, palette), width='stretch')
     c, d = st.columns([0.52, 0.48], gap='large')
     with c:
-        st.altair_chart(role_priority_chart(row, palette), use_container_width=True)
+        st.altair_chart(role_priority_chart(row, palette), width='stretch')
     with d:
-        st.altair_chart(percentile_chart(filtered, row, palette), use_container_width=True)
+        st.altair_chart(percentile_chart(filtered, row, palette), width='stretch')
     i1, i2 = st.columns(2, gap='large')
     with i1:
         insight_card('Root cause framing', f"The strongest need sits with {row['primary_fractional_cxo']} at {row['primary_need_score']:.1f}, while the operating profile shows friction in reporting, compliance, delivery, or talent depending on the account pattern.")
@@ -644,9 +647,9 @@ with t3:
     section_header('Solution architecture', 'Break the offer into layers so the value creation logic is visible', 'Readers buy faster when they can see how the solution works. This tab turns the recommendation into a structured intervention with roles, AI layers, and expansion logic.')
     a, b = st.columns([0.5, 0.5], gap='large')
     with a:
-        st.altair_chart(executive_score_chart(row, model, palette), use_container_width=True)
+        st.altair_chart(executive_score_chart(row, model, palette), width='stretch')
     with b:
-        st.altair_chart(role_priority_chart(row, palette), use_container_width=True)
+        st.altair_chart(role_priority_chart(row, palette), width='stretch')
     i1, i2, i3 = st.columns(3, gap='large')
     with i1:
         insight_card('Primary wedge', f"Start with {row['primary_fractional_cxo']} because it has the highest modeled need and the strongest link to the current pain pattern.")
@@ -659,10 +662,10 @@ with t4:
     section_header('Commercial momentum', 'Show that this is not only a strong idea, but also a winnable deal', 'This tab makes the business case stronger by showing whether the account is moving, engaging, and attractive relative to the portfolio.')
     a, b = st.columns([0.48, 0.52], gap='large')
     with a:
-        st.altair_chart(revenue_motion_chart(row, palette), use_container_width=True)
+        st.altair_chart(revenue_motion_chart(row, palette), width='stretch')
     with b:
-        st.altair_chart(funnel_chart(row, palette), use_container_width=True)
-    st.altair_chart(peer_map_chart(filtered, row, palette), use_container_width=True)
+        st.altair_chart(funnel_chart(row, palette), width='stretch')
+    st.altair_chart(peer_map_chart(filtered, row, palette), width='stretch')
     i1, i2, i3 = st.columns(3, gap='large')
     with i1:
         insight_card('Pipeline signal', f"The quarterly inquiry pattern and revenue growth show whether the account is accelerating, plateauing, or losing momentum commercially.")
@@ -675,12 +678,12 @@ with t5:
     section_header('Implementation case', 'Make the solution look executable, not theoretical', 'A persuasive dashboard should end with confidence, not curiosity. This tab shows how the deal lands, how value is proven, and what comparable accounts look like.')
     a, b = st.columns([0.58, 0.42], gap='large')
     with a:
-        st.altair_chart(roadmap_chart(row, palette), use_container_width=True)
+        st.altair_chart(roadmap_chart(row, palette), width='stretch')
     with b:
         insight_card('First move', f"Begin with: {row['ideal_next_action']}. Use the initial phase to quantify the value pool, align the sponsor, and shorten the path to commitment.")
         insight_card('Contract logic', f"Expected ACV is {fmt_aed(row['expected_annual_contract_value_aed'])}, expected LTV is {fmt_aed(row['expected_account_ltv_aed'])}, and the expected contract term is {int(row['expected_contract_term_months'])} months.")
         insight_card('Implementation confidence', f"Feasibility scores well because complexity headroom is {100-float(row['expansion_complexity_score']):.0f}, data maturity is {float(row['data_maturity_score']):.0f}, and account health is {float(row['account_health_score']):.0f}.")
     st.subheader('Closest comparable accounts')
-    st.dataframe(comparable_accounts(filtered, row), use_container_width=True, hide_index=True)
+    st.dataframe(comparable_accounts(filtered, row), width='stretch', hide_index=True)
 
 st.download_button('Download filtered dataset', filtered.to_csv(index=False).encode('utf-8'), file_name='yalla_cxo_filtered.csv', mime='text/csv')
