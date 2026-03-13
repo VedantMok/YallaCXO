@@ -275,29 +275,53 @@ def map_view(filtered):
     if "latitude" not in filtered.columns or "longitude" not in filtered.columns:
         st.info("No map columns found.")
         return
+
     m = filtered[["company_name", "latitude", "longitude", "weighted_acv", "primary_role_derived", "hq_zone"]].dropna().copy()
     if m.empty:
         st.info("No map-ready rows available.")
         return
+
+    m["latitude"] = pd.to_numeric(m["latitude"], errors="coerce")
+    m["longitude"] = pd.to_numeric(m["longitude"], errors="coerce")
+    m["weighted_acv"] = pd.to_numeric(m["weighted_acv"], errors="coerce").fillna(0)
+    m = m.dropna(subset=["latitude", "longitude"])
+    if m.empty:
+        st.info("Map coordinates are invalid after cleaning.")
+        return
+
     max_val = max(float(m["weighted_acv"].max()), 1.0)
-    m["radius"] = ((m["weighted_acv"] / max_val) * 26000 + 6000).clip(6000, 34000)
+    m["radius"] = ((m["weighted_acv"] / max_val) * 6000 + 250).clip(250, 2200)
+
+    st.caption("Smaller circles and a flat map view make the Dubai clusters readable.")
+
     deck = pdk.Deck(
-        map_style="mapbox://styles/mapbox/light-v10",
-        initial_view_state=pdk.ViewState(latitude=float(m["latitude"].mean()), longitude=float(m["longitude"].mean()), zoom=9.6, pitch=30),
+        map_style="light",
+        initial_view_state=pdk.ViewState(
+            latitude=float(m["latitude"].mean()),
+            longitude=float(m["longitude"].mean()),
+            zoom=10.4,
+            pitch=0,
+        ),
         layers=[
             pdk.Layer(
                 "ScatterplotLayer",
                 data=m,
                 get_position='[longitude, latitude]',
                 get_radius='radius',
-                get_fill_color='[37, 99, 235, 160]',
-                get_line_color='[255,255,255]',
+                radius_units='meters',
+                radius_min_pixels=4,
+                radius_max_pixels=18,
+                get_fill_color='[37, 99, 235, 140]',
+                get_line_color='[255,255,255,180]',
                 line_width_min_pixels=1,
                 pickable=True,
                 stroked=True,
             )
         ],
-        tooltip={"html": "<b>{company_name}</b><br/>Zone: {hq_zone}<br/>Primary role: {primary_role_derived}<br/>Weighted ACV: {weighted_acv}", "style": {"backgroundColor": "#111827", "color": "white"}},
+        tooltip={
+            "html": "<b>{company_name}</b><br/>Zone: {hq_zone}<br/>Primary role: {primary_role_derived}<br/>Weighted ACV: {weighted_acv}",
+            "style": {"backgroundColor": "#111827", "color": "white"},
+        },
     )
     st.pydeck_chart(deck, use_container_width=True)
 
