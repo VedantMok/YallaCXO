@@ -343,7 +343,7 @@ def static_map(filtered, row):
             'html': '<b>{company_name}</b><br/>Zone: {hq_zone}<br/>Primary role: {primary_role_derived}<br/>Weighted ACV: {weighted_acv}',
             'style': {'backgroundColor': '#0B1424', 'color': 'white'}
         },
-        controller=False,
+
     )
     st.pydeck_chart(deck, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
