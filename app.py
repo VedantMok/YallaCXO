@@ -12,23 +12,61 @@ def load_data():
 def get_palette(mode: str):
     if mode == "Light":
         return {
-            "bg": "#F5F7FB", "bg_grad_1": "rgba(61, 131, 255, 0.08)", "bg_grad_2": "rgba(16, 185, 129, 0.08)",
-            "panel": "rgba(255,255,255,0.82)", "panel_solid": "#FFFFFF", "border": "rgba(15, 23, 42, 0.08)",
-            "text": "#102033", "muted": "#5E738A", "soft": "#E9EEF5", "accent": "#2563EB", "accent_2": "#14B8A6",
-            "accent_3": "#7C3AED", "success": "#10B981", "danger": "#F97316", "pill_bg": "rgba(37, 99, 235, 0.06)",
-            "callout_start": "rgba(37, 99, 235, 0.08)", "callout_end": "rgba(20, 184, 166, 0.08)", "chart_text": "#102033",
-            "chart_label": "#4B6075", "chart_grid": "rgba(15, 23, 42, 0.08)", "hero_start": "#EAF2FF", "hero_mid": "#F7FBFF",
-            "hero_end": "#EEFFFB", "shadow": "0 16px 40px rgba(15,23,42,0.08)", "metric_cost": "#64748B", "metric_save": "#10B981",
+            "bg": "#F5F7FB",
+            "bg_grad_1": "rgba(61, 131, 255, 0.08)",
+            "bg_grad_2": "rgba(16, 185, 129, 0.08)",
+            "panel": "rgba(255,255,255,0.82)",
+            "panel_solid": "#FFFFFF",
+            "border": "rgba(15, 23, 42, 0.08)",
+            "text": "#102033",
+            "muted": "#5E738A",
+            "soft": "#E9EEF5",
+            "accent": "#2563EB",
+            "accent_2": "#14B8A6",
+            "accent_3": "#7C3AED",
+            "success": "#10B981",
+            "danger": "#F97316",
+            "pill_bg": "rgba(37, 99, 235, 0.06)",
+            "callout_start": "rgba(37, 99, 235, 0.08)",
+            "callout_end": "rgba(20, 184, 166, 0.08)",
+            "chart_text": "#102033",
+            "chart_label": "#4B6075",
+            "chart_grid": "rgba(15, 23, 42, 0.08)",
+            "hero_start": "#EAF2FF",
+            "hero_mid": "#F7FBFF",
+            "hero_end": "#EEFFFB",
+            "shadow": "0 16px 40px rgba(15,23,42,0.08)",
+            "metric_cost": "#64748B",
+            "metric_save": "#10B981",
             "highlight": "#2563EB",
         }
     return {
-        "bg": "#0B1220", "bg_grad_1": "rgba(37, 99, 235, 0.12)", "bg_grad_2": "rgba(20, 184, 166, 0.10)",
-        "panel": "rgba(15, 23, 42, 0.72)", "panel_solid": "#111827", "border": "rgba(148, 163, 184, 0.14)",
-        "text": "#E8EEF8", "muted": "#9FB0C5", "soft": "#1E293B", "accent": "#60A5FA", "accent_2": "#2DD4BF",
-        "accent_3": "#A78BFA", "success": "#34D399", "danger": "#FB923C", "pill_bg": "rgba(96, 165, 250, 0.08)",
-        "callout_start": "rgba(96, 165, 250, 0.10)", "callout_end": "rgba(45, 212, 191, 0.10)", "chart_text": "#E8EEF8",
-        "chart_label": "#AFC0D6", "chart_grid": "rgba(148, 163, 184, 0.12)", "hero_start": "#0F172A", "hero_mid": "#111827",
-        "hero_end": "#10243B", "shadow": "0 18px 46px rgba(2,6,23,0.34)", "metric_cost": "#94A3B8", "metric_save": "#34D399",
+        "bg": "#0B1220",
+        "bg_grad_1": "rgba(37, 99, 235, 0.12)",
+        "bg_grad_2": "rgba(20, 184, 166, 0.10)",
+        "panel": "rgba(15, 23, 42, 0.72)",
+        "panel_solid": "#111827",
+        "border": "rgba(148, 163, 184, 0.14)",
+        "text": "#E8EEF8",
+        "muted": "#9FB0C5",
+        "soft": "#1E293B",
+        "accent": "#60A5FA",
+        "accent_2": "#2DD4BF",
+        "accent_3": "#A78BFA",
+        "success": "#34D399",
+        "danger": "#FB923C",
+        "pill_bg": "rgba(96, 165, 250, 0.08)",
+        "callout_start": "rgba(96, 165, 250, 0.10)",
+        "callout_end": "rgba(45, 212, 191, 0.10)",
+        "chart_text": "#E8EEF8",
+        "chart_label": "#AFC0D6",
+        "chart_grid": "rgba(148, 163, 184, 0.12)",
+        "hero_start": "#0F172A",
+        "hero_mid": "#111827",
+        "hero_end": "#10243B",
+        "shadow": "0 18px 46px rgba(2,6,23,0.34)",
+        "metric_cost": "#94A3B8",
+        "metric_save": "#34D399",
         "highlight": "#60A5FA",
     }
 
@@ -39,17 +77,38 @@ def enable_altair_theme(p):
             "config": {
                 "background": "transparent",
                 "view": {"stroke": None},
-                "title": {"color": p["chart_text"], "fontSize": 18, "font": "Space Grotesk", "anchor": "start", "fontWeight": 700},
-                "axis": {"labelColor": p["chart_label"], "titleColor": p["chart_text"], "gridColor": p["chart_grid"], "domainColor": p["chart_grid"], "tickColor": p["chart_grid"], "labelFont": "Inter", "titleFont": "Inter"},
-                "legend": {"labelColor": p["chart_label"], "titleColor": p["chart_text"], "labelFont": "Inter", "titleFont": "Inter"},
-                "range": {"category": [p["accent"], p["accent_2"], p["accent_3"], p["success"], p["danger"], "#FBBF24"]},
+                "title": {
+                    "color": p["chart_text"],
+                    "fontSize": 18,
+                    "font": "Space Grotesk",
+                    "anchor": "start",
+                    "fontWeight": 700,
+                },
+                "axis": {
+                    "labelColor": p["chart_label"],
+                    "titleColor": p["chart_text"],
+                    "gridColor": p["chart_grid"],
+                    "domainColor": p["chart_grid"],
+                    "tickColor": p["chart_grid"],
+                    "labelFont": "Inter",
+                    "titleFont": "Inter",
+                },
+                "legend": {
+                    "labelColor": p["chart_label"],
+                    "titleColor": p["chart_text"],
+                    "labelFont": "Inter",
+                    "titleFont": "Inter",
+                },
+                "range": {
+                    "category": [p["accent"], p["accent_2"], p["accent_3"], p["success"], p["danger"], "#FBBF24"]
+                },
             }
         }
     try:
-        alt.themes.register("yalla_descriptive_theme", theme)
+        alt.themes.register("yalla_fixed_theme", theme)
     except Exception:
         pass
-    alt.themes.enable("yalla_descriptive_theme")
+    alt.themes.enable("yalla_fixed_theme")
 
 
 def inject_css(p):
@@ -60,7 +119,7 @@ def inject_css(p):
     .stApp {{background: radial-gradient(circle at 10% 20%, {p['bg_grad_1']}, transparent 28%), radial-gradient(circle at 90% 10%, {p['bg_grad_2']}, transparent 25%), linear-gradient(180deg, {p['bg']} 0%, {p['bg']} 100%); color: {p['text']};}}
     .block-container {{padding-top: 1.1rem; padding-bottom: 2rem; max-width: 1440px;}}
     section[data-testid="stSidebar"] {{display:none;}}
-    .hero-shell {{background: linear-gradient(135deg, {p['hero_start']} 0%, {p['hero_mid']} 55%, {p['hero_end']} 100%); border: 1px solid {p['border']}; border-radius: 28px; padding: 1.55rem 1.75rem 1.35rem 1.75rem; box-shadow: {p['shadow']}; margin-bottom: 1rem; position: relative; overflow: hidden;}}
+    .hero-shell {{background: linear-gradient(135deg, {p['hero_start']} 0%, {p['hero_mid']} 55%, {p['hero_end']} 100%); border: 1px solid {p['border']}; border-radius: 28px; padding: 1.55rem 1.75rem 1.35rem 1.75rem; box-shadow: {p['shadow']}; margin-bottom: 1rem; overflow: hidden;}}
     .hero-top {{display:flex; align-items:flex-start; justify-content:space-between; gap:1rem;}}
     .hero-title {{font-family: 'Space Grotesk', sans-serif; font-size: 2.25rem; font-weight: 700; margin: 0; color: {p['text']};}}
     .hero-sub {{margin-top: .42rem; color: {p['muted']}; max-width: 980px; line-height: 1.6; font-size: 1rem;}}
@@ -222,12 +281,18 @@ def percentile_profile_chart(filtered, row, p):
     data = []
     for label, col in metrics:
         percentile = float((filtered[col] <= row[col]).mean() * 100)
-        data.append({'Metric': label, 'Percentile': percentile})
+        if percentile >= 75:
+            bar_color = p['success']
+        elif percentile >= 50:
+            bar_color = p['accent']
+        else:
+            bar_color = p['metric_cost']
+        data.append({'Metric': label, 'Percentile': percentile, 'BarColor': bar_color})
     df = pd.DataFrame(data).sort_values('Percentile', ascending=True)
     base = alt.Chart(df).mark_bar(cornerRadiusEnd=10, height=24).encode(
         x=alt.X('Percentile:Q', title='Percentile within filtered portfolio', scale=alt.Scale(domain=[0, 100])),
         y=alt.Y('Metric:N', sort=None, title=''),
-        color=alt.condition(alt.datum.Percentile >= 75, alt.value(p['success']), alt.condition(alt.datum.Percentile >= 50, alt.value(p['accent']), alt.value(p['metric_cost']))),
+        color=alt.Color('BarColor:N', scale=None, legend=None),
         tooltip=['Metric', alt.Tooltip('Percentile:Q', format='.1f')]
     )
     rule = alt.Chart(pd.DataFrame({'x': [50]})).mark_rule(strokeDash=[6, 6], color=p['chart_grid']).encode(x='x:Q')
@@ -317,9 +382,10 @@ def action_roadmap_chart(row, p):
     expansion_days = max(close_days + 30, int(row['next_service_expansion_days']))
     primary = row['primary_fractional_cxo']
     secondary = row['secondary_fractional_cxo']
+    diagnose_end = max(10, min(14, close_days // 2 if close_days > 1 else 7))
     roadmap = pd.DataFrame([
-        {'Stage': 'Pitch and diagnose', 'Start': 0, 'End': max(10, min(14, close_days // 2 if close_days > 1 else 7)), 'Owner': 'Commercial'},
-        {'Stage': 'Close and onboard', 'Start': max(10, min(14, close_days // 2 if close_days > 1 else 7)), 'End': close_days, 'Owner': 'Commercial'},
+        {'Stage': 'Pitch and diagnose', 'Start': 0, 'End': diagnose_end, 'Owner': 'Commercial'},
+        {'Stage': 'Close and onboard', 'Start': diagnose_end, 'End': close_days, 'Owner': 'Commercial'},
         {'Stage': f'Activate {primary}', 'Start': close_days, 'End': close_days + 30, 'Owner': primary},
         {'Stage': 'Deploy AI operating layer', 'Start': close_days + 15, 'End': close_days + 45, 'Owner': 'AI layer'},
         {'Stage': f'Expand into {secondary}', 'Start': close_days + 35, 'End': expansion_days, 'Owner': secondary},
@@ -554,7 +620,7 @@ with tab1:
     with i1:
         insight_card('Commercial summary', texts['economics'])
     with i2:
-        insight_card('Why this account stands out', f"This company sits at percentile-led positions across savings, ACV, ROI, urgency, and LTV, giving you a factual way to explain why it deserves time now.")
+        insight_card('Why this account stands out', 'This company is benchmarked across savings, ACV, ROI, urgency, and LTV so the descriptive story is grounded in relative position, not just isolated metrics.')
 
 with tab2:
     section_header('Diagnostic', 'Explain the underlying business problem', 'These charts connect executive need, operating friction, and account readiness so the recommendation feels evidence-based rather than generic.')
